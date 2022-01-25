@@ -13,10 +13,9 @@
 #include	"systiming.h"
 #include	"x_errors_events.h"
 
-#define	debugFLAG					0xF001
+#define	debugFLAG					0xF000
 
-#define	debugCONFIG					(debugFLAG & 0x0001)
-#define	debugCONVERT				(debugFLAG & 0x0002)
+#define	debugCONVERT				(debugFLAG & 0x0001)
 
 #define	debugTIMING					(debugFLAG_GLOBAL & debugFLAG & 0x1000)
 #define	debugTRACK					(debugFLAG_GLOBAL & debugFLAG & 0x2000)
@@ -24,13 +23,16 @@
 #define	debugRESULT					(debugFLAG_GLOBAL & debugFLAG & 0x8000)
 
 /* ##################################### Developer notes ###########################################
-	Add auto ranging support if sum of raw values close to 0 or above 100,000
-	Scale gain factor up or down...
+	Consider NOT supporting as 3 normal logged sensors, since actual values no sense.
+	Define modes to represent specific conditions to be detected, events to be generated
+		Orientation	Hor/Ver/???/4D/6D
+		Movement Freefall Impact
+		Roll/Pitch/Yaw representation
 */
+
 
 // ############################################# Macros ############################################
 
-#define	lis2hh12I2C_LOGIC			0					// 0 = delay, 1= stretch, 2= stages
 
 // #################################### SI7006/13/20/21 Addresses ##################################
 
@@ -42,6 +44,10 @@
 
 // ######################################### Constants #############################################
 
+const gpio_config_t lis2hh12IntPin = { 1ULL<<GPIO_NUM_36, GPIO_MODE_INPUT, GPIO_PULLUP_DISABLE, GPIO_PULLDOWN_DISABLE, GPIO_INTR_DISABLE};
+
+const uint16_t fs_scale[4] = { 2000, -1, 4000, 8000 };
+const uint16_t odr_scale[8] = { 0, 10, 50, 100, 200, 400, 800, -1 };
 
 // ###################################### Local variables ##########################################
 
@@ -49,48 +55,107 @@ lis2hh12_t sLIS2HH12 = { 0 };
 
 // #################################### Local ONLY functions #######################################
 
-int lis2hh12ReadReg(uint8_t Reg, uint8_t * pRxBuf) {
-	return halI2C_Queue(sLIS2HH12.psI2C, i2cWR_B, &Reg, sizeof(Reg),
-			pRxBuf, sizeof(uint8_t), (i2cq_p1_t) NULL, (i2cq_p2_t) NULL);
+void lis2hh12ReadRegs(uint8_t Reg, uint8_t * pRxBuf, size_t RxSize) {
+	xRtosSemaphoreTake(&sLIS2HH12.mux, portMAX_DELAY);
+	halI2C_Queue(sLIS2HH12.psI2C, i2cWR_B, &Reg, sizeof(Reg),
+			pRxBuf, RxSize, (i2cq_p1_t) NULL, (i2cq_p2_t) NULL);
+	xRtosSemaphoreGive(&sLIS2HH12.mux);
 }
 
-int lis2hh12WriteReg(uint8_t reg, uint8_t val) {
+void lis2hh12WriteReg(uint8_t reg, uint8_t val) {
 	uint8_t u8Buf[2] = { reg, val };
-	return halI2C_Queue(sLIS2HH12.psI2C, i2cW_B, u8Buf, sizeof(u8Buf), NULL, 0, (i2cq_p1_t) NULL, (i2cq_p2_t) NULL);
+	xRtosSemaphoreTake(&sLIS2HH12.mux, portMAX_DELAY);
+	halI2C_Queue(sLIS2HH12.psI2C, i2cW, u8Buf, sizeof(u8Buf), NULL, 0, (i2cq_p1_t) NULL, (i2cq_p2_t) NULL);
+	xRtosSemaphoreGive(&sLIS2HH12.mux);
 }
 
-#if (lis2hh12I2C_LOGIC == 1)		// read and convert in 1 go...
-int	lis2hh12ReadHdlr(epw_t * psEWP) {
-	IF_SYSTIMER_START(debugTIMING, stLIS2HH12);
-	for (uint8_t Reg = 0; Reg < 4; ++Reg) {
-		lis2hh12ReadReg(Reg+lis2hh12DATA_CH1_0, (uint8_t *) &sLIS2HH12.Reg.ch[Reg]);
+/**
+ * perform a Write-Modify-Read transaction, also updates local register value
+ */
+void lis2hh12UpdateReg(uint8_t reg, uint8_t * pRxBuf, uint8_t _and, uint8_t _or) {
+	xRtosSemaphoreTake(&sLIS2HH12.mux, portMAX_DELAY);
+	halI2C_Queue(sLIS2HH12.psI2C, i2cWRMW_B, &reg, sizeof(reg), pRxBuf, 1,
+			(i2cq_p1_t) (uint32_t) _and, (i2cq_p2_t) (uint32_t) _or);
+	xRtosSemaphoreGive(&sLIS2HH12.mux);
+}
+
+// #################################### Interrupt support ##########################################
+
+int lis2hh12EventHandler(void) {
+	if (sLIS2HH12.Reg.ctrl3.int1_inact) {
+		return halGPIO_DIG_IN_GetState(0) ? kwMOVEMENT : kwINACTIVE;
 	}
+	return kwNULL;					// no/unknown event
+}
+
+// #################################  IRMACOS sensor task support ##################################
+
+int	lis2hh12ReadHdlrAccel(epw_t * psEWP) {
+	IF_SYSTIMER_START(debugTIMING, stLIS2HH12);
+	lis2hh12ReadRegs(lis2hh12STATUS, (uint8_t *) &sLIS2HH12.Reg.STATUS, 7);
 	IF_SYSTIMER_STOP(debugTIMING, stLIS2HH12);
-	IF_PRINT(debugCONVERT, "lis2hh12  [ %-'B ]\n", 4, sLIS2HH12.Reg.ch);
 	x64_t X64;
-	///
+	X64.x32[1].f32 = (float) fs_scale[sLIS2HH12.Reg.ctrl4.fs] / 65536000.0;
+	X64.x32[0].f32 = (float) sLIS2HH12.Reg.u16OUT_X * X64.x32[1].f32;
 	vCV_SetValue(&table_work[URI_LIS2HH12_X].var, X64);
+	X64.x32[0].f32 = (float) sLIS2HH12.Reg.u16OUT_Y * X64.x32[1].f32;
+	vCV_SetValue(&table_work[URI_LIS2HH12_Y].var, X64);
+	X64.x32[0].f32 = (float) sLIS2HH12.Reg.u16OUT_Z * X64.x32[1].f32;
+	vCV_SetValue(&table_work[URI_LIS2HH12_Z].var, X64);
+	IF_PRINT(debugCONVERT, "lis2hh12  [ %-'B ]\n", 7, &sLIS2HH12.Reg.STATUS);
+	if (ioB1GET(ioLIS2HH12)) {
+		if (sLIS2HH12.Reg.status.zyxor)
+			PRINT("LIS2HH12 ZYX overrun");
+	}
 	return erSUCCESS;
 }
-#elif (lis2hh12I2C_LOGIC == 2)		// clock stretching
-	#error "Clock stretching not supported"
-#elif (lis2hh12I2C_LOGIC == 3)		// 3 step read -> wait -> convert
-	#error "3 Step read -> wait -> convert not supported"
-#endif
 
 // ################################ Rules configuration support ####################################
 
-int	lis2hh12ConfigMode (struct rule_t * psR, int Xcur, int Xmax) {
-	// mode /lis2hh12 idx gain time rate
-	uint8_t	AI = psR->ActIdx;
-	int gain = psR->para.x32[AI][0].i32;
-	int time = psR->para.x32[AI][1].i32;
-	int rate = psR->para.x32[AI][2].i32;
-	IF_PRINT(debugCONFIG && ioB1GET(ioMode), "mode 'LIS2HH12' Xcur=%d Xmax=%d gain=%d time=%d rate=%d\n", Xcur, Xmax, gain, time, rate);
+/**
+ * Mode	0 = normal ths dur odr hr [etc]
+ *		1 = [In]/Active
+ *		2 = freefall
+ *		3 = orientation 4D portrait/landscape
+ *		4 = orientation 6D
+ *		5 = stream using FIFO
+ */
+enum {
+	lis2hh12M_NORMAL,
+	lis2hh12M_MOVEMENT,
+	lis2hh12M_FREEFAAL,
+	lis2hh12M_ORIENT4D,
+	lis2hh12M_ORIENT6D,
+	lis2hh12M_STREAM,
+};
 
-	if (OUTSIDE(0, gain, 7, int) || OUTSIDE(0, time, 7, int) || OUTSIDE(0, rate, 7, int) || gain==4 || gain==5)
-		ERR_RETURN("Invalid gain / time / rate specified", erSCRIPT_INV_PARA);
+int	lis2hh12ConfigMode (struct rule_t * psR, int Xcur, int Xmax, int EI) {
+	// mode /lis2hh12 idx ths dur odr hr
+	uint8_t	AI = psR->ActIdx;
+	int mode = psR->actPar1[AI];
+	int ths = psR->para.x32[AI][0].i32;
+	int dur = psR->para.x32[AI][1].i32;
+	int odr = psR->para.x32[AI][2].i32;
+	int hr = psR->para.x32[AI][3].i32;
+	IF_PRINT(debugTRACK && ioB1GET(ioMode), "lis2hh12: Xcur=%d Xmax=%d ths=%d dur=%d odr=%d hr=%d\n", Xcur, Xmax, ths, dur, odr, hr);
+
+	if (OUTSIDE(lis2hh12M_NORMAL, mode, lis2hh12M_STREAM, int) ||
+		OUTSIDE(0, ths, 127, int) ||
+		OUTSIDE(0, dur, 255, int) ||
+		OUTSIDE(0, odr, 7, int) ||
+		OUTSIDE(0, hr, 1, int)) {
+		ERR_RETURN("Invalid ths/dur/odr/hr specified", erSCRIPT_INV_PARA);
+	}
 	int iRV = erSUCCESS;
+	do {
+		lis2hh12WriteReg(lis2hh12ACT_THS, sLIS2HH12.Reg.ACT_THS = ths);
+		lis2hh12WriteReg(lis2hh12ACT_DUR, sLIS2HH12.Reg.ACT_DUR = dur);
+		sLIS2HH12.Reg.ctrl1.hr = hr;
+		sLIS2HH12.Reg.ctrl1.odr = odr;
+		lis2hh12WriteReg(lis2hh12CTRL1, sLIS2HH12.Reg.CTRL1);
+		IF_PRINT(debugTRACK && ioB1GET(ioMode), "lis2hh12: THS=0x%02X  DUR=0x%02X  CTRL1=ox%02X\n",
+				sLIS2HH12.Reg.ACT_THS,sLIS2HH12.Reg.ACT_DUR, sLIS2HH12.Reg.CTRL1);
+	} while (++Xcur < Xmax);
 	return iRV;
 }
 
@@ -107,23 +172,32 @@ int	lis2hh12Identify(i2c_di_t * psI2C_DI) {
 	sLIS2HH12.psI2C = psI2C_DI;
 
 	uint8_t U8;
-	int iRV = lis2hh12ReadReg(lis2hh12WHO_AM_I, &U8);
-	if (iRV != erSUCCESS)
+	int iRV;
+	lis2hh12ReadRegs(lis2hh12WHO_AM_I, &U8, sizeof(U8));
+	if (U8 != lis2hh12WHOAMI_NUM) {
+		iRV = erFAILURE;
 		goto exit;
-	if (U8 != lis2hh12WHOAMI_NUM)
-		goto exit_err;
+	}
 	psI2C_DI->Type		= i2cDEV_LIS2HH12;
 	psI2C_DI->Speed		= i2cSPEED_400;
 	psI2C_DI->DevIdx 	= 0;
-	goto exit;
-exit_err:
-	iRV = erFAILURE;
+	iRV = erSUCCESS;
 exit:
 	psI2C_DI->Test = 0;
 	return iRV ;
 }
 
 int	lis2hh12Config(i2c_di_t * psI2C_DI) {
+#if 1
+	// enable device
+	lis2hh12UpdateReg(lis2hh12CTRL1, &sLIS2HH12.Reg.CTRL1, 0xFF, 0x3F); 	// XYZen ODR=100Hz BDU
+	// enable In/Activity interrupt
+	lis2hh12UpdateReg(lis2hh12CTRL3, &sLIS2HH12.Reg.CTRL3, 0xFF, 1 << 5);	// INT1_INACT
+#else
+	lis2hh12WriteReg(lis2hh12CTRL1, sLIS2HH12.Reg.CTRL1 = 0x3F); 			// ODR = 10Hz
+	lis2hh12WriteReg(lis2hh12CTRL3, sLIS2HH12.Reg.CTRL3 = 0x20);			// INT1_INACT
+#endif
+
 	epw_t * psEWP = &table_work[URI_LIS2HH12_X];
 	psEWP->var.def.cv.vc = 1;
 	psEWP->var.def.cv.vs = vs32B;
@@ -148,18 +222,7 @@ int	lis2hh12Config(i2c_di_t * psI2C_DI) {
 	psEWP->Tsns = psEWP->Rsns = LIS2HH12_T_SNS;
 	psEWP->uri = URI_LIS2HH12_Z;
 
-	psEWP = &table_work[URI_LIS2HH12_T];
-	psEWP->var.def.cv.vc = 1;
-	psEWP->var.def.cv.vs = vs32B;
-	psEWP->var.def.cv.vf = vfFXX;
-	psEWP->var.def.cv.vt = vtVALUE;
-	psEWP->Tsns = psEWP->Rsns = LIS2HH12_T_SNS;
-	psEWP->uri = URI_LIS2HH12_T;
-
-#if (lis2hh12I2C_LOGIC == 3)
-	sLIS2HH12.timer = xTimerCreate("lis2hh12", pdMS_TO_TICKS(5), pdFALSE, NULL, lis2hh12TimerHdlr);
-#endif
-	IF_SYSTIMER_INIT(debugTIMING, stLIS2HH12, stMILLIS, "LIS2HH12", 1, 20);
+	IF_SYSTIMER_INIT(debugTIMING, stLIS2HH12, stMICROS, "LIS2HH12", 500, 1500);
 	return erSUCCESS ;
 }
 
@@ -171,4 +234,20 @@ int	lis2hh12Diags(i2c_di_t * psI2C_DI) { return erSUCCESS; }
 
 void lis2hh12ReportAll(void) {
 	halI2C_DeviceReport(sLIS2HH12.psI2C);
+	PRINT("\tACT_THS: 0x%02X (%dmg) \n", sLIS2HH12.Reg.ACT_THS, sLIS2HH12.Reg.ACT_THS*(fs_scale[sLIS2HH12.Reg.ctrl4.fs]/128));
+	PRINT("\tACT_DUR: 0x%02X (%ds) \n", sLIS2HH12.Reg.ACT_DUR, sLIS2HH12.Reg.ACT_DUR);
+	PRINT("\tCTRL1: 0x%02X  hr=%d  odr=%d (%DHz) bdu=%d  Zen=%d  Yen=%d  Xen=%d\n", sLIS2HH12.Reg.CTRL1,
+		sLIS2HH12.Reg.ctrl1.hr, sLIS2HH12.Reg.ctrl1.odr, odr_scale[sLIS2HH12.Reg.ctrl1.odr],
+		sLIS2HH12.Reg.ctrl1.bdu,
+		sLIS2HH12.Reg.ctrl1.zen, sLIS2HH12.Reg.ctrl1.yen, sLIS2HH12.Reg.ctrl1.xen);
+	PRINT("\tCTRL4: 0x%02X  bw=%d  fs=%d (%dG)  bws_odr=%d  IAinc=%d  I2Cen=%d  sim=%d\n", sLIS2HH12.Reg.CTRL4,
+		sLIS2HH12.Reg.ctrl4.bw, sLIS2HH12.Reg.ctrl4.fs, fs_scale[sLIS2HH12.Reg.ctrl4.fs]/1000,
+		sLIS2HH12.Reg.ctrl4.bw_scale_odr,
+		sLIS2HH12.Reg.ctrl4.if_add_inc,
+		sLIS2HH12.Reg.ctrl4.i2c_enable,
+		sLIS2HH12.Reg.ctrl4.sim);
+	PRINT("\tCTRL5: 0x%02X  debug=%d  reset=%d  dec=%d  st=%d  HLactive=%d  pp_od=%d\n", sLIS2HH12.Reg.CTRL5,
+		sLIS2HH12.Reg.ctrl5.debug, sLIS2HH12.Reg.ctrl5.soft_reset, sLIS2HH12.Reg.ctrl5.dec,
+		sLIS2HH12.Reg.ctrl5.st, sLIS2HH12.Reg.ctrl5.h_lactive, sLIS2HH12.Reg.ctrl5.pp_od);
+//	PRINT("I1: 0x%02x  I2: 0x%02x\n", sLIS2HH12.Reg.IG_SRC1, sLIS2HH12.Reg.IG_SRC2);
 }

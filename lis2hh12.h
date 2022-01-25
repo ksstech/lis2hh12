@@ -62,28 +62,129 @@ enum {
 
 // ######################################### Structures ############################################
 
-typedef struct __attribute__((packed)) {
-	uint8_t mode : 1;				// 0=Standby  1=Active
-	uint8_t	reset : 1;
-	uint8_t	gain : 3;
-	uint8_t	res : 3;
-} lis2hh12_control_t;
+typedef struct __attribute__((packed)) {				// CTRL1
+	uint8_t xen : 1;
+	uint8_t yen : 1;
+	uint8_t zen : 1;
+	uint8_t	bdu : 1;
+	uint8_t	odr : 3;				// 0 = off, 10->800Hz
+	uint8_t	hr : 1;					// 1 = high resolution enabled
+} lis2hh12_ctrl1_t;
 
-typedef struct __attribute__((packed)) {
-	union {							// TEMP
-		uint16_t u16TEMP;
-		uint8_t u8TEMP[2];
-	};
+typedef struct __attribute__((packed)) {				// CTRL2
+	uint8_t hpis2 : 1;
+	uint8_t hpis1 : 1;
+	uint8_t fds : 1;
+	uint8_t	hpm : 2;
+	uint8_t	dfc1 : 2;
+	uint8_t	res : 1;
+} lis2hh12_ctrl2_t;
+
+typedef struct __attribute__((packed)) {				// CTRL3
+	uint8_t int1_drdy : 1;
+	uint8_t int1_fth : 1;
+	uint8_t int1_ovr : 1;
+	uint8_t	int1_ig1 : 1;
+	uint8_t	int1_ig2 : 1;
+	uint8_t	int1_inact : 1;
+	uint8_t stop_fth : 1;
+	uint8_t fifo_en : 1;
+} lis2hh12_ctrl3_t;
+
+typedef struct __attribute__((packed)) {				// CTRL4
+	uint8_t sim : 1;
+	uint8_t i2c_enable : 1;
+	uint8_t if_add_inc : 1;
+	uint8_t	bw_scale_odr : 1;
+	uint8_t	fs : 2;
+	uint8_t	bw : 2;
+} lis2hh12_ctrl4_t;
+
+typedef struct __attribute__((packed)) {				// CTRL5
+	uint8_t pp_od : 1;
+	uint8_t h_lactive : 1;
+	uint8_t st : 2;
+	uint8_t	dec : 2;
+	uint8_t	soft_reset : 1;
+	uint8_t debug : 1;
+} lis2hh12_ctrl5_t;
+
+typedef struct __attribute__((packed)) {				// CTRL6
+	uint8_t int2_drdy : 1;
+	uint8_t int_fth : 1;
+	uint8_t int_empty : 1;
+	uint8_t	int2_ig1 : 1;
+	uint8_t	int2_ig2 : 1;
+	uint8_t	int2_boot : 1;
+	uint8_t	res : 1;
+	uint8_t	boot : 1;
+} lis2hh12_ctrl6_t;
+
+typedef struct __attribute__((packed)) {				// CTRL7
+	uint8_t _4d_ig : 2;
+	uint8_t lir : 2;
+	uint8_t dcrm : 2;
+	uint8_t	res : 2;
+} lis2hh12_ctrl7_t;
+
+typedef struct __attribute__((packed)) {				// STATUS
+	uint8_t xda : 1;
+	uint8_t yda : 1;
+	uint8_t zda : 1;
+	uint8_t	zyxda : 1;
+	uint8_t	xor : 1;
+	uint8_t	yor : 1;
+	uint8_t	zor : 1;
+	uint8_t	zyxor: 1;
+} lis2hh12_status_t;
+
+typedef struct __attribute__((packed)) {				// FIFO_CTRL
+	uint8_t	fth : 5;
+	uint8_t	fmode: 3;
+} lis2hh12_fifo_ctrl_t;
+
+typedef struct __attribute__((packed)) {				// FIFO_SRC
+	uint8_t	fss : 5;
+	uint8_t	empty: 1;
+	uint8_t	ovr: 1;
+	uint8_t	fth: 1;
+} lis2hh12_fifo_src_t;
+
+typedef struct __attribute__((packed)) {				// REGS
 	uint8_t ACT_THS;
 	uint8_t ACT_DUR;
-	uint8_t CTRL1;
-	uint8_t CTRL2;
-	uint8_t CTRL3;
-	uint8_t CTRL4;
-	uint8_t CTRL5;
-	uint8_t CTRL6;
-	uint8_t CTRL7;
-	uint8_t STATUS;
+	union {							// CTRL1
+		lis2hh12_ctrl1_t ctrl1;
+		uint8_t CTRL1;
+	};
+	union {							// CTRL2
+		lis2hh12_ctrl2_t ctrl2;
+		uint8_t CTRL2;
+	};
+	union {							// CTRL3
+		lis2hh12_ctrl3_t ctrl3;
+		uint8_t CTRL3;
+	};
+	union {							// CTRL4
+		lis2hh12_ctrl4_t ctrl4;
+		uint8_t CTRL4;
+	};
+	union {							// CTRL5
+		lis2hh12_ctrl5_t ctrl5;
+		uint8_t CTRL5;
+	};
+	union {							// CTRL6
+		lis2hh12_ctrl6_t ctrl6;
+		uint8_t CTRL6;
+	};
+	union {							// CTRL7
+		lis2hh12_ctrl7_t ctrl7;
+		uint8_t CTRL7;
+	};
+	union {							// STATUS
+		lis2hh12_status_t status;
+		uint8_t STATUS;
+	};
 	union {							// OUT_X
 		uint16_t u16OUT_X;
 		uint8_t u8OUT_X[2];
@@ -96,8 +197,14 @@ typedef struct __attribute__((packed)) {
 		uint16_t u16OUT_Z;
 		uint8_t u8OUT_Z[2];
 	};
-	uint8_t FIFO_CTRL;
-	uint8_t FIFO_SRC;
+	union {							// FIFO_CTRL
+		lis2hh12_fifo_ctrl_t fifo_ctrl;
+		uint8_t FIFO_CTRL;
+	};
+	union {							// FIFO_SRC
+		lis2hh12_fifo_src_t fifo_src;
+		uint8_t FIFO_SRC;
+	};
 	uint8_t IG_CFG1;
 	uint8_t IG_SRC1;
 	uint8_t IG_THS_X1;
@@ -121,23 +228,21 @@ typedef struct __attribute__((packed)) {
 		uint8_t u8REF_Z[2];
 	};
 } lis2hh12_reg_t;
-DUMB_STATIC_ASSERT(sizeof(lis2hh12_reg_t) == 36);
+DUMB_STATIC_ASSERT(sizeof(lis2hh12_reg_t) == 34);
 
 typedef struct __attribute__((packed)) {				// SI70006/13/14/20/xx TMP & RH sensors
 	i2c_di_t *		psI2C;			// 4 bytes
 	SemaphoreHandle_t mux;
-	TimerHandle_t	timer;
-	union {
-		lis2hh12_reg_t Reg;
-		uint8_t u8Buf[sizeof(lis2hh12_reg_t)];
-	};
+	lis2hh12_reg_t Reg;
 } lis2hh12_t;
-DUMB_STATIC_ASSERT(sizeof(lis2hh12_t) == 48);
+DUMB_STATIC_ASSERT(sizeof(lis2hh12_t) == 42);
 
 // ###################################### Public variables #########################################
 
 
 // ###################################### Public functions #########################################
+
+int lis2hh12EventHandler(void);
 
 int	lis2hh12Identify(i2c_di_t * psI2C_DI);
 int	lis2hh12Config(i2c_di_t * psI2C_DI);
@@ -146,10 +251,10 @@ int	lis2hh12Diags(i2c_di_t * psI2C_DI);
 void lis2hh12ReportAll(void) ;
 
 struct rule_t ;
-int	lis2hh12ConfigMode (struct rule_t *, int Xcur, int Xmax);
+int	lis2hh12ConfigMode (struct rule_t *, int Xcur, int Xmax, int EI);
 
 struct epw_t ;
-int	lis2hh12ReadHdlr(epw_t * psEWP);
+int	lis2hh12ReadHdlrAccel(epw_t * psEWP);
 
 #ifdef __cplusplus
 	}
