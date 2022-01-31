@@ -22,15 +22,6 @@
 #define	debugPARAM					(debugFLAG_GLOBAL & debugFLAG & 0x4000)
 #define	debugRESULT					(debugFLAG_GLOBAL & debugFLAG & 0x8000)
 
-/* ##################################### Developer notes ###########################################
-	Consider NOT supporting as 3 normal logged sensors, since actual values no sense.
-	Define modes to represent specific conditions to be detected, events to be generated
-		Orientation	Hor/Ver/???/4D/6D
-		Movement Freefall Impact
-		Roll/Pitch/Yaw representation
-*/
-
-
 // ############################################# Macros ############################################
 
 
