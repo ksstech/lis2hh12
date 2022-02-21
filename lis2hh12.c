@@ -135,7 +135,7 @@ int	lis2hh12ConfigMode (struct rule_t * psR, int Xcur, int Xmax, int EI) {
 		OUTSIDE(0, dur, 255, int) ||
 		OUTSIDE(0, odr, 7, int) ||
 		OUTSIDE(0, hr, 1, int)) {
-		ERR_RETURN("Invalid ths/dur/odr/hr specified", erSCRIPT_INV_PARA);
+		ERR_RETURN("Invalid ths/dur/odr/hr specified", erINVALID_PARA);
 	}
 	int iRV = erSUCCESS;
 	do {
