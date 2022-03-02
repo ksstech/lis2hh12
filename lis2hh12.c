@@ -93,7 +93,7 @@ int	lis2hh12ReadHdlrAccel(epw_t * psEWP) {
 	vCV_SetValue(&table_work[URI_LIS2HH12_Y].var, X64);
 	X64.x32[0].f32 = (float) sLIS2HH12.Reg.u16OUT_Z * X64.x32[1].f32;
 	vCV_SetValue(&table_work[URI_LIS2HH12_Z].var, X64);
-	IF_PRINT(debugCONVERT, "lis2hh12  [ %-'B ]\n", 7, &sLIS2HH12.Reg.STATUS);
+	IF_P(debugCONVERT, "lis2hh12  [ %-'B ]\n", 7, &sLIS2HH12.Reg.STATUS);
 	if (ioB1GET(ioLIS2HH12)) {
 		if (sLIS2HH12.Reg.status.zyxor)
 			PRINT("LIS2HH12 ZYX overrun");
@@ -128,7 +128,7 @@ int	lis2hh12ConfigMode (struct rule_t * psR, int Xcur, int Xmax, int EI) {
 	int dur = psR->para.x32[AI][1].i32;
 	int odr = psR->para.x32[AI][2].i32;
 	int hr = psR->para.x32[AI][3].i32;
-	IF_PRINT(debugTRACK && ioB1GET(ioMode), "lis2hh12: Xcur=%d Xmax=%d ths=%d dur=%d odr=%d hr=%d\n", Xcur, Xmax, ths, dur, odr, hr);
+	IF_P(debugTRACK && ioB1GET(ioMode), "lis2hh12: Xcur=%d Xmax=%d ths=%d dur=%d odr=%d hr=%d\n", Xcur, Xmax, ths, dur, odr, hr);
 
 	if (OUTSIDE(lis2hh12M_NORMAL, mode, lis2hh12M_STREAM, int) ||
 		OUTSIDE(0, ths, 127, int) ||
@@ -144,7 +144,7 @@ int	lis2hh12ConfigMode (struct rule_t * psR, int Xcur, int Xmax, int EI) {
 		sLIS2HH12.Reg.ctrl1.hr = hr;
 		sLIS2HH12.Reg.ctrl1.odr = odr;
 		lis2hh12WriteReg(lis2hh12CTRL1, sLIS2HH12.Reg.CTRL1);
-		IF_PRINT(debugTRACK && ioB1GET(ioMode), "lis2hh12: THS=0x%02X  DUR=0x%02X  CTRL1=ox%02X\n",
+		IF_P(debugTRACK && ioB1GET(ioMode), "lis2hh12: THS=0x%02X  DUR=0x%02X  CTRL1=ox%02X\n",
 				sLIS2HH12.Reg.ACT_THS,sLIS2HH12.Reg.ACT_DUR, sLIS2HH12.Reg.CTRL1);
 	} while (++Xcur < Xmax);
 	return iRV;
