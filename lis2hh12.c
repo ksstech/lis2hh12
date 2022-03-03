@@ -96,7 +96,7 @@ int	lis2hh12ReadHdlrAccel(epw_t * psEWP) {
 	IF_P(debugCONVERT, "lis2hh12  [ %-'B ]\n", 7, &sLIS2HH12.Reg.STATUS);
 	if (ioB1GET(ioLIS2HH12)) {
 		if (sLIS2HH12.Reg.status.zyxor)
-			PRINT("LIS2HH12 ZYX overrun");
+			P("LIS2HH12 ZYX overrun");
 	}
 	return erSUCCESS;
 }
@@ -225,20 +225,20 @@ int	lis2hh12Diags(i2c_di_t * psI2C_DI) { return erSUCCESS; }
 
 void lis2hh12ReportAll(void) {
 	halI2C_DeviceReport(sLIS2HH12.psI2C);
-	PRINT("\tACT_THS: 0x%02X (%dmg) \n", sLIS2HH12.Reg.ACT_THS, sLIS2HH12.Reg.ACT_THS*(fs_scale[sLIS2HH12.Reg.ctrl4.fs]/128));
-	PRINT("\tACT_DUR: 0x%02X (%ds) \n", sLIS2HH12.Reg.ACT_DUR, sLIS2HH12.Reg.ACT_DUR);
-	PRINT("\tCTRL1: 0x%02X  hr=%d  odr=%d (%DHz) bdu=%d  Zen=%d  Yen=%d  Xen=%d\n", sLIS2HH12.Reg.CTRL1,
+	P("\tACT_THS: 0x%02X (%dmg) \n", sLIS2HH12.Reg.ACT_THS, sLIS2HH12.Reg.ACT_THS*(fs_scale[sLIS2HH12.Reg.ctrl4.fs]/128));
+	P("\tACT_DUR: 0x%02X (%ds) \n", sLIS2HH12.Reg.ACT_DUR, sLIS2HH12.Reg.ACT_DUR);
+	P("\tCTRL1: 0x%02X  hr=%d  odr=%d (%DHz) bdu=%d  Zen=%d  Yen=%d  Xen=%d\n", sLIS2HH12.Reg.CTRL1,
 		sLIS2HH12.Reg.ctrl1.hr, sLIS2HH12.Reg.ctrl1.odr, odr_scale[sLIS2HH12.Reg.ctrl1.odr],
 		sLIS2HH12.Reg.ctrl1.bdu,
 		sLIS2HH12.Reg.ctrl1.zen, sLIS2HH12.Reg.ctrl1.yen, sLIS2HH12.Reg.ctrl1.xen);
-	PRINT("\tCTRL4: 0x%02X  bw=%d  fs=%d (%dG)  bws_odr=%d  IAinc=%d  I2Cen=%d  sim=%d\n", sLIS2HH12.Reg.CTRL4,
+	P("\tCTRL4: 0x%02X  bw=%d  fs=%d (%dG)  bws_odr=%d  IAinc=%d  I2Cen=%d  sim=%d\n", sLIS2HH12.Reg.CTRL4,
 		sLIS2HH12.Reg.ctrl4.bw, sLIS2HH12.Reg.ctrl4.fs, fs_scale[sLIS2HH12.Reg.ctrl4.fs]/1000,
 		sLIS2HH12.Reg.ctrl4.bw_scale_odr,
 		sLIS2HH12.Reg.ctrl4.if_add_inc,
 		sLIS2HH12.Reg.ctrl4.i2c_enable,
 		sLIS2HH12.Reg.ctrl4.sim);
-	PRINT("\tCTRL5: 0x%02X  debug=%d  reset=%d  dec=%d  st=%d  HLactive=%d  pp_od=%d\n", sLIS2HH12.Reg.CTRL5,
+	P("\tCTRL5: 0x%02X  debug=%d  reset=%d  dec=%d  st=%d  HLactive=%d  pp_od=%d\n", sLIS2HH12.Reg.CTRL5,
 		sLIS2HH12.Reg.ctrl5.debug, sLIS2HH12.Reg.ctrl5.soft_reset, sLIS2HH12.Reg.ctrl5.dec,
 		sLIS2HH12.Reg.ctrl5.st, sLIS2HH12.Reg.ctrl5.h_lactive, sLIS2HH12.Reg.ctrl5.pp_od);
-//	PRINT("I1: 0x%02x  I2: 0x%02x\n", sLIS2HH12.Reg.IG_SRC1, sLIS2HH12.Reg.IG_SRC2);
+//	P("I1: 0x%02x  I2: 0x%02x\n", sLIS2HH12.Reg.IG_SRC1, sLIS2HH12.Reg.IG_SRC2);
 }
