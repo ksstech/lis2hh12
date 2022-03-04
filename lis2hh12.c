@@ -2,16 +2,18 @@
  * Copyright 2022 Andre M. Maree/KSS Technologies (Pty) Ltd.
  */
 
-#include	"lis2hh12.h"
-#include	<string.h>
+#include <string.h>
 
-#include	"hal_variables.h"
-#include	"endpoints.h"
-#include	"options.h"
-#include	"printfx.h"
-#include	"syslog.h"
-#include	"systiming.h"
-#include	"x_errors_events.h"
+#include "lis2hh12.h"
+#include "hal_gpio.h"
+
+#include "hal_variables.h"
+#include "endpoints.h"
+#include "options.h"
+#include "printfx.h"
+#include "syslog.h"
+#include "systiming.h"
+#include "x_errors_events.h"
 
 #define	debugFLAG					0xF000
 
