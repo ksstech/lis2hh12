@@ -76,7 +76,7 @@ void lis2hh12UpdateReg(uint8_t reg, uint8_t * pRxBuf, uint8_t _and, uint8_t _or)
 
 int lis2hh12EventHandler(void) {
 	if (sLIS2HH12.Reg.ctrl3.int1_inact) {
-		return halGPIO_DIG_IN_GetState(0) ? kwMOVEMENT : kwINACTIVE;
+		return halGPDI_GetState(0) ? kwMOVEMENT : kwINACTIVE;
 	}
 	return kwNULL;					// no/unknown event
 }
