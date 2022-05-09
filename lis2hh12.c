@@ -137,9 +137,8 @@ int	lis2hh12ConfigMode (struct rule_t * psR, int Xcur, int Xmax, int EI) {
 		OUTSIDE(0, dur, 255, int) ||
 		OUTSIDE(0, odr, 7, int) ||
 		OUTSIDE(0, hr, 1, int)) {
-		ERR_RETURN("Invalid ths/dur/odr/hr specified", erINVALID_PARA);
+		RETURN_MX("Invalid ths/dur/odr/hr specified", erINVALID_PARA);
 	}
-	int iRV = erSUCCESS;
 	do {
 		lis2hh12WriteReg(lis2hh12ACT_THS, sLIS2HH12.Reg.ACT_THS = ths);
 		lis2hh12WriteReg(lis2hh12ACT_DUR, sLIS2HH12.Reg.ACT_DUR = dur);
@@ -149,7 +148,7 @@ int	lis2hh12ConfigMode (struct rule_t * psR, int Xcur, int Xmax, int EI) {
 		IF_P(debugTRACK && ioB1GET(ioMode), "lis2hh12: THS=0x%02X  DUR=0x%02X  CTRL1=ox%02X\n",
 				sLIS2HH12.Reg.ACT_THS,sLIS2HH12.Reg.ACT_DUR, sLIS2HH12.Reg.CTRL1);
 	} while (++Xcur < Xmax);
-	return iRV;
+	return erSUCCESS;
 }
 
 // ################### Identification, Diagnostics & Configuration functions #######################
@@ -167,10 +166,7 @@ int	lis2hh12Identify(i2c_di_t * psI2C_DI) {
 	uint8_t U8;
 	int iRV;
 	lis2hh12ReadRegs(lis2hh12WHO_AM_I, &U8, sizeof(U8));
-	if (U8 != lis2hh12WHOAMI_NUM) {
-		iRV = erFAILURE;
-		goto exit;
-	}
+	IF_EXIT_X(U8 != lis2hh12WHOAMI_NUM, erFAILURE);
 	psI2C_DI->Type		= i2cDEV_LIS2HH12;
 	psI2C_DI->Speed		= i2cSPEED_400;
 	psI2C_DI->DevIdx 	= 0;
