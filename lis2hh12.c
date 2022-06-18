@@ -96,7 +96,7 @@ int	lis2hh12ReadHdlrAccel(epw_t * psEWP) {
 	X64.x32[0].f32 = (float) sLIS2HH12.Reg.u16OUT_Z * X64.x32[1].f32;
 	vCV_SetValue(&table_work[URI_LIS2HH12_Z].var, X64);
 	IF_P(debugCONVERT, "lis2hh12  [ %-`B ]\r\n", 7, &sLIS2HH12.Reg.STATUS);
-	if (ioB1GET(ioLIS2HH12)) {
+	if (ioB1GET(dbgLIS2HH12)) {
 		if (sLIS2HH12.Reg.status.zyxor)
 			P("LIS2HH12 ZYX overrun");
 	}
