@@ -230,12 +230,12 @@ typedef struct __attribute__((packed)) {				// REGS
 } lis2hh12_reg_t;
 DUMB_STATIC_ASSERT(sizeof(lis2hh12_reg_t) == 34);
 
-typedef struct __attribute__((packed)) {				// SI70006/13/14/20/xx TMP & RH sensors
-	i2c_di_t *		psI2C;			// 4 bytes
+typedef struct {
+	i2c_di_t * psI2C;
 	SemaphoreHandle_t mux;
 	lis2hh12_reg_t Reg;
 } lis2hh12_t;
-DUMB_STATIC_ASSERT(sizeof(lis2hh12_t) == 42);
+//DUMB_STATIC_ASSERT(sizeof(lis2hh12_t) == 42);
 
 // ###################################### Public variables #########################################
 
