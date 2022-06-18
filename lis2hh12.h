@@ -63,169 +63,169 @@ enum {
 // ######################################### Structures ############################################
 
 typedef struct __attribute__((packed)) {				// CTRL1
-	uint8_t xen : 1;
-	uint8_t yen : 1;
-	uint8_t zen : 1;
-	uint8_t	bdu : 1;
-	uint8_t	odr : 3;				// 0 = off, 10->800Hz
-	uint8_t	hr : 1;					// 1 = high resolution enabled
+	u8_t xen : 1;
+	u8_t yen : 1;
+	u8_t zen : 1;
+	u8_t bdu : 1;
+	u8_t odr : 3;				// 0 = off, 10->800Hz
+	u8_t hr : 1;					// 1 = high resolution enabled
 } lis2hh12_ctrl1_t;
 
 typedef struct __attribute__((packed)) {				// CTRL2
-	uint8_t hpis2 : 1;
-	uint8_t hpis1 : 1;
-	uint8_t fds : 1;
-	uint8_t	hpm : 2;
-	uint8_t	dfc1 : 2;
-	uint8_t	res : 1;
+	u8_t hpis2 : 1;
+	u8_t hpis1 : 1;
+	u8_t fds : 1;
+	u8_t hpm : 2;
+	u8_t dfc1 : 2;
+	u8_t res : 1;
 } lis2hh12_ctrl2_t;
 
 typedef struct __attribute__((packed)) {				// CTRL3
-	uint8_t int1_drdy : 1;
-	uint8_t int1_fth : 1;
-	uint8_t int1_ovr : 1;
-	uint8_t	int1_ig1 : 1;
-	uint8_t	int1_ig2 : 1;
-	uint8_t	int1_inact : 1;
-	uint8_t stop_fth : 1;
-	uint8_t fifo_en : 1;
+	u8_t int1_drdy : 1;
+	u8_t int1_fth : 1;
+	u8_t int1_ovr : 1;
+	u8_t int1_ig1 : 1;
+	u8_t int1_ig2 : 1;
+	u8_t int1_inact : 1;
+	u8_t stop_fth : 1;
+	u8_t fifo_en : 1;
 } lis2hh12_ctrl3_t;
 
 typedef struct __attribute__((packed)) {				// CTRL4
-	uint8_t sim : 1;
-	uint8_t i2c_enable : 1;
-	uint8_t if_add_inc : 1;
-	uint8_t	bw_scale_odr : 1;
-	uint8_t	fs : 2;
-	uint8_t	bw : 2;
+	u8_t sim : 1;
+	u8_t i2c_enable : 1;
+	u8_t if_add_inc : 1;
+	u8_t bw_scale_odr : 1;
+	u8_t fs : 2;
+	u8_t bw : 2;
 } lis2hh12_ctrl4_t;
 
 typedef struct __attribute__((packed)) {				// CTRL5
-	uint8_t pp_od : 1;
-	uint8_t h_lactive : 1;
-	uint8_t st : 2;
-	uint8_t	dec : 2;
-	uint8_t	soft_reset : 1;
-	uint8_t debug : 1;
+	u8_t pp_od : 1;
+	u8_t h_lactive : 1;
+	u8_t st : 2;
+	u8_t dec : 2;
+	u8_t soft_reset : 1;
+	u8_t debug : 1;
 } lis2hh12_ctrl5_t;
 
 typedef struct __attribute__((packed)) {				// CTRL6
-	uint8_t int2_drdy : 1;
-	uint8_t int_fth : 1;
-	uint8_t int_empty : 1;
-	uint8_t	int2_ig1 : 1;
-	uint8_t	int2_ig2 : 1;
-	uint8_t	int2_boot : 1;
-	uint8_t	res : 1;
-	uint8_t	boot : 1;
+	u8_t int2_drdy : 1;
+	u8_t int_fth : 1;
+	u8_t int_empty : 1;
+	u8_t int2_ig1 : 1;
+	u8_t int2_ig2 : 1;
+	u8_t int2_boot : 1;
+	u8_t res : 1;
+	u8_t boot : 1;
 } lis2hh12_ctrl6_t;
 
 typedef struct __attribute__((packed)) {				// CTRL7
-	uint8_t _4d_ig : 2;
-	uint8_t lir : 2;
-	uint8_t dcrm : 2;
-	uint8_t	res : 2;
+	u8_t _4d_ig : 2;
+	u8_t lir : 2;
+	u8_t dcrm : 2;
+	u8_t res : 2;
 } lis2hh12_ctrl7_t;
 
 typedef struct __attribute__((packed)) {				// STATUS
-	uint8_t xda : 1;
-	uint8_t yda : 1;
-	uint8_t zda : 1;
-	uint8_t	zyxda : 1;
-	uint8_t	xor : 1;
-	uint8_t	yor : 1;
-	uint8_t	zor : 1;
-	uint8_t	zyxor: 1;
+	u8_t xda : 1;
+	u8_t yda : 1;
+	u8_t zda : 1;
+	u8_t zyxda : 1;
+	u8_t xor : 1;
+	u8_t yor : 1;
+	u8_t zor : 1;
+	u8_t zyxor: 1;
 } lis2hh12_status_t;
 
 typedef struct __attribute__((packed)) {				// FIFO_CTRL
-	uint8_t	fth : 5;
-	uint8_t	fmode: 3;
+	u8_t fth : 5;
+	u8_t fmode: 3;
 } lis2hh12_fifo_ctrl_t;
 
 typedef struct __attribute__((packed)) {				// FIFO_SRC
-	uint8_t	fss : 5;
-	uint8_t	empty: 1;
-	uint8_t	ovr: 1;
-	uint8_t	fth: 1;
+	u8_t fss : 5;
+	u8_t empty: 1;
+	u8_t ovr: 1;
+	u8_t fth: 1;
 } lis2hh12_fifo_src_t;
 
 typedef struct __attribute__((packed)) {				// REGS
-	uint8_t ACT_THS;
-	uint8_t ACT_DUR;
+	u8_t ACT_THS;
+	u8_t ACT_DUR;
 	union {							// CTRL1
 		lis2hh12_ctrl1_t ctrl1;
-		uint8_t CTRL1;
+		u8_t CTRL1;
 	};
 	union {							// CTRL2
 		lis2hh12_ctrl2_t ctrl2;
-		uint8_t CTRL2;
+		u8_t CTRL2;
 	};
 	union {							// CTRL3
 		lis2hh12_ctrl3_t ctrl3;
-		uint8_t CTRL3;
+		u8_t CTRL3;
 	};
 	union {							// CTRL4
 		lis2hh12_ctrl4_t ctrl4;
-		uint8_t CTRL4;
+		u8_t CTRL4;
 	};
 	union {							// CTRL5
 		lis2hh12_ctrl5_t ctrl5;
-		uint8_t CTRL5;
+		u8_t CTRL5;
 	};
 	union {							// CTRL6
 		lis2hh12_ctrl6_t ctrl6;
-		uint8_t CTRL6;
+		u8_t CTRL6;
 	};
 	union {							// CTRL7
 		lis2hh12_ctrl7_t ctrl7;
-		uint8_t CTRL7;
+		u8_t CTRL7;
 	};
 	union {							// STATUS
 		lis2hh12_status_t status;
-		uint8_t STATUS;
+		u8_t STATUS;
 	};
 	union {							// OUT_X
-		uint16_t u16OUT_X;
-		uint8_t u8OUT_X[2];
+		u16_t u16OUT_X;
+		u8_t u8OUT_X[2];
 	};
 	union {							// OUT_Y
-		uint16_t u16OUT_Y;
-		uint8_t u8OUT_Y[2];
+		u16_t u16OUT_Y;
+		u8_t u8OUT_Y[2];
 	};
 	union {							// OUT_Z
-		uint16_t u16OUT_Z;
-		uint8_t u8OUT_Z[2];
+		u16_t u16OUT_Z;
+		u8_t u8OUT_Z[2];
 	};
 	union {							// FIFO_CTRL
 		lis2hh12_fifo_ctrl_t fifo_ctrl;
-		uint8_t FIFO_CTRL;
+		u8_t FIFO_CTRL;
 	};
 	union {							// FIFO_SRC
 		lis2hh12_fifo_src_t fifo_src;
-		uint8_t FIFO_SRC;
+		u8_t FIFO_SRC;
 	};
-	uint8_t IG_CFG1;
-	uint8_t IG_SRC1;
-	uint8_t IG_THS_X1;
-	uint8_t IG_THS_Y1;
-	uint8_t IG_THS_Z1;
-	uint8_t IG_DUR1;
-	uint8_t IG_CFG2;
-	uint8_t IG_SRC2;
-	uint8_t IG_THS2;
-	uint8_t IG_DUR2;
+	u8_t IG_CFG1;
+	u8_t IG_SRC1;
+	u8_t IG_THS_X1;
+	u8_t IG_THS_Y1;
+	u8_t IG_THS_Z1;
+	u8_t IG_DUR1;
+	u8_t IG_CFG2;
+	u8_t IG_SRC2;
+	u8_t IG_THS2;
+	u8_t IG_DUR2;
 	union {							// REF_X
-		uint16_t u16REF_X;
-		uint8_t u8REF_X[2];
+		u16_t u16REF_X;
+		u8_t u8REF_X[2];
 	};
 	union {							// REF_Y
-		uint16_t u16REF_Y;
-		uint8_t u8REF_Y[2];
+		u16_t u16REF_Y;
+		u8_t u8REF_Y[2];
 	};
 	union {							// REF_Z
-		uint16_t u16REF_Z;
-		uint8_t u8REF_Z[2];
+		u16_t u16REF_Z;
+		u8_t u8REF_Z[2];
 	};
 } lis2hh12_reg_t;
 DUMB_STATIC_ASSERT(sizeof(lis2hh12_reg_t) == 34);
