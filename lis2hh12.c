@@ -1,12 +1,10 @@
 /*
- * Copyright 2022 Andre M. Maree/KSS Technologies (Pty) Ltd.
+ * lis12hh12.c
+ * Copyright (c0 2022 Andre M. Maree / KSS Technologies (Pty) Ltd.
  */
-
-#include <string.h>
 
 #include "lis2hh12.h"
 #include "hal_gpio.h"
-
 #include "hal_variables.h"
 #include "endpoints.h"
 #include "options.h"
@@ -16,8 +14,6 @@
 #include "x_errors_events.h"
 
 #define	debugFLAG					0xF000
-
-#define	debugCONVERT				(debugFLAG & 0x0001)
 
 #define	debugTIMING					(debugFLAG_GLOBAL & debugFLAG & 0x1000)
 #define	debugTRACK					(debugFLAG_GLOBAL & debugFLAG & 0x2000)
@@ -75,9 +71,8 @@ void lis2hh12UpdateReg(u8_t reg, u8_t * pRxBuf, u8_t _and, u8_t _or) {
 // #################################### Interrupt support ##########################################
 
 int lis2hh12EventHandler(void) {
-	if (sLIS2HH12.Reg.ctrl3.int1_inact) {
+	if (sLIS2HH12.Reg.ctrl3.int1_inact)
 		return halGPDI_GetState(0) ? kwMOVEMENT : kwINACTIVE;
-	}
 	return kwNULL;					// no/unknown event
 }
 
