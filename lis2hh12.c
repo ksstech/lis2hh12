@@ -39,8 +39,8 @@
 
 const gpio_config_t lis2hh12IntPin = { 1ULL<<GPIO_NUM_36, GPIO_MODE_INPUT, GPIO_PULLUP_DISABLE, GPIO_PULLDOWN_DISABLE, GPIO_INTR_DISABLE};
 
-const uint16_t fs_scale[4] = { 2000, -1, 4000, 8000 };
-const uint16_t odr_scale[8] = { 0, 10, 50, 100, 200, 400, 800, -1 };
+const u16_t fs_scale[4] = { 2000, -1, 4000, 8000 };
+const u16_t odr_scale[8] = { 0, 10, 50, 100, 200, 400, 800, -1 };
 
 // ###################################### Local variables ##########################################
 
@@ -48,15 +48,15 @@ lis2hh12_t sLIS2HH12 = { 0 };
 
 // #################################### Local ONLY functions #######################################
 
-void lis2hh12ReadRegs(uint8_t Reg, uint8_t * pRxBuf, size_t RxSize) {
+void lis2hh12ReadRegs(u8_t Reg, u8_t * pRxBuf, size_t RxSize) {
 	xRtosSemaphoreTake(&sLIS2HH12.mux, portMAX_DELAY);
 	halI2C_Queue(sLIS2HH12.psI2C, i2cWR_B, &Reg, sizeof(Reg),
 			pRxBuf, RxSize, (i2cq_p1_t) NULL, (i2cq_p2_t) NULL);
 	xRtosSemaphoreGive(&sLIS2HH12.mux);
 }
 
-void lis2hh12WriteReg(uint8_t reg, uint8_t val) {
-	uint8_t u8Buf[2] = { reg, val };
+void lis2hh12WriteReg(u8_t reg, u8_t val) {
+	u8_t u8Buf[2] = { reg, val };
 	xRtosSemaphoreTake(&sLIS2HH12.mux, portMAX_DELAY);
 	halI2C_Queue(sLIS2HH12.psI2C, i2cW, u8Buf, sizeof(u8Buf), NULL, 0, (i2cq_p1_t) NULL, (i2cq_p2_t) NULL);
 	xRtosSemaphoreGive(&sLIS2HH12.mux);
@@ -65,7 +65,7 @@ void lis2hh12WriteReg(uint8_t reg, uint8_t val) {
 /**
  * perform a Write-Modify-Read transaction, also updates local register value
  */
-void lis2hh12UpdateReg(uint8_t reg, uint8_t * pRxBuf, uint8_t _and, uint8_t _or) {
+void lis2hh12UpdateReg(u8_t reg, u8_t * pRxBuf, u8_t _and, u8_t _or) {
 	xRtosSemaphoreTake(&sLIS2HH12.mux, portMAX_DELAY);
 	halI2C_Queue(sLIS2HH12.psI2C, i2cWRMW_B, &reg, sizeof(reg), pRxBuf, 1,
 			(i2cq_p1_t) (uint32_t) _and, (i2cq_p2_t) (uint32_t) _or);
@@ -85,7 +85,7 @@ int lis2hh12EventHandler(void) {
 
 int	lis2hh12ReadHdlrAccel(epw_t * psEWP) {
 	IF_SYSTIMER_START(debugTIMING, stLIS2HH12);
-	lis2hh12ReadRegs(lis2hh12STATUS, (uint8_t *) &sLIS2HH12.Reg.STATUS, 7);
+	lis2hh12ReadRegs(lis2hh12STATUS, (u8_t *) &sLIS2HH12.Reg.STATUS, 7);
 	IF_SYSTIMER_STOP(debugTIMING, stLIS2HH12);
 	x64_t X64;
 	X64.x32[1].f32 = (float) fs_scale[sLIS2HH12.Reg.ctrl4.fs] / 65536000.0;
@@ -124,19 +124,19 @@ enum {
 
 int	lis2hh12ConfigMode (struct rule_t * psR, int Xcur, int Xmax, int EI) {
 	// mode /lis2hh12 idx ths dur odr hr
-	uint8_t	AI = psR->ActIdx;
-	int mode = psR->actPar1[AI];
-	int ths = psR->para.x32[AI][0].i32;
-	int dur = psR->para.x32[AI][1].i32;
-	int odr = psR->para.x32[AI][2].i32;
-	int hr = psR->para.x32[AI][3].i32;
+	u8_t AI = psR->ActIdx;
+	s32_t mode = psR->actPar1[AI];
+	s32_t ths = psR->para.x32[AI][0].i32;
+	s32_t dur = psR->para.x32[AI][1].i32;
+	s32_t odr = psR->para.x32[AI][2].i32;
+	s32_t hr = psR->para.x32[AI][3].i32;
 	IF_P(debugTRACK && ioB1GET(ioMode), "lis2hh12: Xcur=%d Xmax=%d ths=%d dur=%d odr=%d hr=%d\r\n", Xcur, Xmax, ths, dur, odr, hr);
 
-	if (OUTSIDE(lis2hh12M_NORMAL, mode, lis2hh12M_STREAM, int) ||
-		OUTSIDE(0, ths, 127, int) ||
-		OUTSIDE(0, dur, 255, int) ||
-		OUTSIDE(0, odr, 7, int) ||
-		OUTSIDE(0, hr, 1, int)) {
+	if (OUTSIDE(lis2hh12M_NORMAL, mode, lis2hh12M_STREAM, s32_t) ||
+		OUTSIDE(0, ths, 127, s32_t) ||
+		OUTSIDE(0, dur, 255, s32_t) ||
+		OUTSIDE(0, odr, 7, s32_t) ||
+		OUTSIDE(0, hr, 1, s32_t)) {
 		RETURN_MX("Invalid ths/dur/odr/hr specified", erINVALID_PARA);
 	}
 	do {
@@ -163,7 +163,7 @@ int	lis2hh12Identify(i2c_di_t * psI2C_DI) {
 	psI2C_DI->Test = 1;
 	sLIS2HH12.psI2C = psI2C_DI;
 
-	uint8_t U8;
+	u8_t U8;
 	int iRV;
 	lis2hh12ReadRegs(lis2hh12WHO_AM_I, &U8, sizeof(U8));
 	IF_EXIT_X(U8 != lis2hh12WHOAMI_NUM, erFAILURE);
