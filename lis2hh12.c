@@ -127,11 +127,11 @@ int	lis2hh12ConfigMode (struct rule_t * psR, int Xcur, int Xmax, int EI) {
 	s32_t hr = psR->para.x32[AI][3].i32;
 	IF_P(debugTRACK && ioB1GET(ioMode), "lis2hh12: Xcur=%d Xmax=%d ths=%d dur=%d odr=%d hr=%d\r\n", Xcur, Xmax, ths, dur, odr, hr);
 
-	if (OUTSIDE(lis2hh12M_NORMAL, mode, lis2hh12M_STREAM, s32_t) ||
-		OUTSIDE(0, ths, 127, s32_t) ||
-		OUTSIDE(0, dur, 255, s32_t) ||
-		OUTSIDE(0, odr, 7, s32_t) ||
-		OUTSIDE(0, hr, 1, s32_t)) {
+	if (OUTSIDE(lis2hh12M_NORMAL, mode, lis2hh12M_STREAM) ||
+		OUTSIDE(0, ths, 127) ||
+		OUTSIDE(0, dur, 255) ||
+		OUTSIDE(0, odr, 7) ||
+		OUTSIDE(0, hr, 1)) {
 		RETURN_MX("Invalid ths/dur/odr/hr specified", erINVALID_PARA);
 	}
 	do {
