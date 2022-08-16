@@ -85,11 +85,11 @@ int	lis2hh12ReadHdlrAccel(epw_t * psEWP) {
 	x64_t X64;
 	X64.x32[1].f32 = (float) fs_scale[sLIS2HH12.Reg.ctrl4.fs] / 65536000.0;
 	X64.x32[0].f32 = (float) sLIS2HH12.Reg.u16OUT_X * X64.x32[1].f32;
-	vCV_SetValue(&table_work[URI_LIS2HH12_X].var, X64);
+	vCV_SetValueRaw(&table_work[URI_LIS2HH12_X].var, X64);
 	X64.x32[0].f32 = (float) sLIS2HH12.Reg.u16OUT_Y * X64.x32[1].f32;
-	vCV_SetValue(&table_work[URI_LIS2HH12_Y].var, X64);
+	vCV_SetValueRaw(&table_work[URI_LIS2HH12_Y].var, X64);
 	X64.x32[0].f32 = (float) sLIS2HH12.Reg.u16OUT_Z * X64.x32[1].f32;
-	vCV_SetValue(&table_work[URI_LIS2HH12_Z].var, X64);
+	vCV_SetValueRaw(&table_work[URI_LIS2HH12_Z].var, X64);
 //	P("lis2hh12  [ %-`B ]\r\n", 7, &sLIS2HH12.Reg.STATUS);
 	if (ioB1GET(dbgLIS2HH12)) {
 		if (sLIS2HH12.Reg.status.zyxor)
@@ -132,7 +132,7 @@ int	lis2hh12ConfigMode (struct rule_t * psR, int Xcur, int Xmax, int EI) {
 		OUTSIDE(0, dur, 255) ||
 		OUTSIDE(0, odr, 7) ||
 		OUTSIDE(0, hr, 1)) {
-		RETURN_MX("Invalid ths/dur/odr/hr specified", erINVALID_PARA);
+		RETURN_MX("Invalid ths/dur/odr/hr specified", erINV_PARA);
 	}
 	do {
 		lis2hh12WriteReg(lis2hh12ACT_THS, sLIS2HH12.Reg.ACT_THS = ths);
@@ -183,26 +183,17 @@ int	lis2hh12Config(i2c_di_t * psI2C_DI) {
 #endif
 
 	epw_t * psEWP = &table_work[URI_LIS2HH12_X];
-	psEWP->var.def.cv.vc = 1;
-	psEWP->var.def.cv.vs = vs32B;
-	psEWP->var.def.cv.vf = vfFXX;
-	psEWP->var.def.cv.vt = vtVALUE;
+	psEWP->var.def = SETDEF_CVAR(0, 0, vtVALUE, cvF32, 1);
 	psEWP->Tsns = psEWP->Rsns = LIS2HH12_T_SNS;
 	psEWP->uri = URI_LIS2HH12_X;
 
 	psEWP = &table_work[URI_LIS2HH12_Y];
-	psEWP->var.def.cv.vc = 1;
-	psEWP->var.def.cv.vs = vs32B;
-	psEWP->var.def.cv.vf = vfFXX;
-	psEWP->var.def.cv.vt = vtVALUE;
+	psEWP->var.def = SETDEF_CVAR(0, 0, vtVALUE, cvF32, 1);
 	psEWP->Tsns = psEWP->Rsns = LIS2HH12_T_SNS;
 	psEWP->uri = URI_LIS2HH12_Y;
 
 	psEWP = &table_work[URI_LIS2HH12_Z];
-	psEWP->var.def.cv.vc = 1;
-	psEWP->var.def.cv.vs = vs32B;
-	psEWP->var.def.cv.vf = vfFXX;
-	psEWP->var.def.cv.vt = vtVALUE;
+	psEWP->var.def = SETDEF_CVAR(0, 0, vtVALUE, cvF32, 1);
 	psEWP->Tsns = psEWP->Rsns = LIS2HH12_T_SNS;
 	psEWP->uri = URI_LIS2HH12_Z;
 
