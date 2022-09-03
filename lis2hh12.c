@@ -211,7 +211,7 @@ void lis2hh12ReportAll(void) {
 	halI2C_DeviceReport(sLIS2HH12.psI2C);
 	P("\tACT_THS: 0x%02X (%dmg) \r\n", sLIS2HH12.Reg.ACT_THS, sLIS2HH12.Reg.ACT_THS*(fs_scale[sLIS2HH12.Reg.ctrl4.fs]/128));
 	P("\tACT_DUR: 0x%02X (%ds) \r\n", sLIS2HH12.Reg.ACT_DUR, sLIS2HH12.Reg.ACT_DUR);
-	P("\tCTRL1: 0x%02X  hr=%d  odr=%d (%DHz) bdu=%d  Zen=%d  Yen=%d  Xen=%d\r\n", sLIS2HH12.Reg.CTRL1,
+	P("\tCTRL1: 0x%02X  hr=%d  odr=%d (%dHz) bdu=%d  Zen=%d  Yen=%d  Xen=%d\r\n", sLIS2HH12.Reg.CTRL1,
 		sLIS2HH12.Reg.ctrl1.hr, sLIS2HH12.Reg.ctrl1.odr, odr_scale[sLIS2HH12.Reg.ctrl1.odr],
 		sLIS2HH12.Reg.ctrl1.bdu,
 		sLIS2HH12.Reg.ctrl1.zen, sLIS2HH12.Reg.ctrl1.yen, sLIS2HH12.Reg.ctrl1.xen);
