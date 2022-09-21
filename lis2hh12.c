@@ -90,7 +90,7 @@ int	lis2hh12ReadHdlrAccel(epw_t * psEWP) {
 	vCV_SetValueRaw(&table_work[URI_LIS2HH12_Y].var, X64);
 	X64.x32[0].f32 = (float) sLIS2HH12.Reg.u16OUT_Z * X64.x32[1].f32;
 	vCV_SetValueRaw(&table_work[URI_LIS2HH12_Z].var, X64);
-//	P("lis2hh12  [ %-`B ]\r\n", 7, &sLIS2HH12.Reg.STATUS);
+//	P("lis2hh12  [ %-'B ]\r\n", 7, &sLIS2HH12.Reg.STATUS);
 	if (ioB1GET(dbgLIS2HH12)) {
 		if (sLIS2HH12.Reg.status.zyxor)
 			P("LIS2HH12 ZYX overrun");
@@ -125,7 +125,7 @@ int	lis2hh12ConfigMode (struct rule_t * psR, int Xcur, int Xmax, int EI) {
 	s32_t dur = psR->para.x32[AI][1].i32;
 	s32_t odr = psR->para.x32[AI][2].i32;
 	s32_t hr = psR->para.x32[AI][3].i32;
-	IF_P(debugTRACK && ioB1GET(dbgMode), "lis2hh12: Xcur=%d Xmax=%d ths=%d dur=%d odr=%d hr=%d\r\n", Xcur, Xmax, ths, dur, odr, hr);
+	IF_P(debugTRACK && ioB1GET(dbgMode), "lis2hh12: Xcur=%d Xmax=%d ths=%ld dur=%ld odr=%ld hr=%ld\r\n", Xcur, Xmax, ths, dur, odr, hr);
 
 	if (OUTSIDE(lis2hh12M_NORMAL, mode, lis2hh12M_STREAM) ||
 		OUTSIDE(0, ths, 127) ||
