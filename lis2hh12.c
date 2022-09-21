@@ -120,11 +120,11 @@ enum {
 int	lis2hh12ConfigMode (struct rule_t * psR, int Xcur, int Xmax, int EI) {
 	// mode /lis2hh12 idx ths dur odr hr
 	u8_t AI = psR->ActIdx;
-	s32_t mode = psR->actPar1[AI];
-	s32_t ths = psR->para.x32[AI][0].i32;
-	s32_t dur = psR->para.x32[AI][1].i32;
-	s32_t odr = psR->para.x32[AI][2].i32;
-	s32_t hr = psR->para.x32[AI][3].i32;
+	i32_t mode = psR->actPar1[AI];
+	i32_t ths = psR->para.x32[AI][0].i32;
+	i32_t dur = psR->para.x32[AI][1].i32;
+	i32_t odr = psR->para.x32[AI][2].i32;
+	i32_t hr = psR->para.x32[AI][3].i32;
 	IF_P(debugTRACK && ioB1GET(dbgMode), "lis2hh12: Xcur=%d Xmax=%d ths=%ld dur=%ld odr=%ld hr=%ld\r\n", Xcur, Xmax, ths, dur, odr, hr);
 
 	if (OUTSIDE(lis2hh12M_NORMAL, mode, lis2hh12M_STREAM) ||
