@@ -4,6 +4,7 @@
  */
 
 #include "hal_variables.h"
+#if (halHAS_LIS2HH12 > 0)
 #include "lis2hh12.h"
 #include "hal_gpio.h"
 #include "endpoints.h"
@@ -226,3 +227,4 @@ void lis2hh12ReportAll(void) {
 		sLIS2HH12.Reg.ctrl5.st, sLIS2HH12.Reg.ctrl5.h_lactive, sLIS2HH12.Reg.ctrl5.pp_od);
 //	P("I1: 0x%02x  I2: 0x%02x\r\n", sLIS2HH12.Reg.IG_SRC1, sLIS2HH12.Reg.IG_SRC2);
 }
+#endif
