@@ -73,7 +73,7 @@ void lis2hh12UpdateReg(u8_t reg, u8_t * pRxBuf, u8_t _and, u8_t _or) {
 
 int lis2hh12EventHandler(void) {
 	if (sLIS2HH12.Reg.ctrl3.int1_inact)
-		return halGPDI_GetState(0) ? kwMOVEMENT : kwINACTIVE;
+		return halGDI_GetState(0) ? kwMOVEMENT : kwINACTIVE;
 	return kwNULL;					// no/unknown event
 }
 
