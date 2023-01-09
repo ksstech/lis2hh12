@@ -3,7 +3,7 @@
  * Copyright (c0 2022 Andre M. Maree / KSS Technologies (Pty) Ltd.
  */
 
-#include "hal_variables.h"
+#include "main.h"
 #if (halHAS_LIS2HH12 > 0)
 #include "lis2hh12.h"
 #include "hal_gpio.h"
