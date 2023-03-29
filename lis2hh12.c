@@ -3,11 +3,13 @@
  * Copyright (c0 2022 Andre M. Maree / KSS Technologies (Pty) Ltd.
  */
 
-#include "main.h"
+#include "hal_config.h"
+
 #if (halHAS_LIS2HH12 > 0)
 #include "lis2hh12.h"
 #include "hal_gpio.h"
 #include "endpoints.h"
+#include "options.h"
 #include "printfx.h"
 #include "rules.h"
 #include "syslog.h"
