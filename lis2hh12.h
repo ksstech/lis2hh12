@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 #include "endpoints.h"
-#include "hal_i2c.h"
+#include "hal_i2cm.h"
 
 #ifdef __cplusplus
 	extern "C" {
@@ -254,7 +254,7 @@ struct rule_t ;
 int	lis2hh12ConfigMode (struct rule_t *, int Xcur, int Xmax, int EI);
 
 struct epw_t ;
-int	lis2hh12ReadHdlrAccel(epw_t * psEWP);
+int	lis2hh12Sense(epw_t * psEWP);
 
 #ifdef __cplusplus
 	}

@@ -49,7 +49,7 @@ lis2hh12_t sLIS2HH12 = { 0 };
 
 void lis2hh12ReadRegs(u8_t Reg, u8_t * pRxBuf, size_t RxSize) {
 	xRtosSemaphoreTake(&sLIS2HH12.mux, portMAX_DELAY);
-	halI2C_Queue(sLIS2HH12.psI2C, i2cWR_B, &Reg, sizeof(Reg),
+	halI2CM_Queue(sLIS2HH12.psI2C, i2cWR_B, &Reg, sizeof(Reg),
 			pRxBuf, RxSize, (i2cq_p1_t) NULL, (i2cq_p2_t) NULL);
 	xRtosSemaphoreGive(&sLIS2HH12.mux);
 }
@@ -57,7 +57,7 @@ void lis2hh12ReadRegs(u8_t Reg, u8_t * pRxBuf, size_t RxSize) {
 void lis2hh12WriteReg(u8_t reg, u8_t val) {
 	u8_t u8Buf[2] = { reg, val };
 	xRtosSemaphoreTake(&sLIS2HH12.mux, portMAX_DELAY);
-	halI2C_Queue(sLIS2HH12.psI2C, i2cW, u8Buf, sizeof(u8Buf), NULL, 0, (i2cq_p1_t) NULL, (i2cq_p2_t) NULL);
+	halI2CM_Queue(sLIS2HH12.psI2C, i2cW, u8Buf, sizeof(u8Buf), NULL, 0, (i2cq_p1_t) NULL, (i2cq_p2_t) NULL);
 	xRtosSemaphoreGive(&sLIS2HH12.mux);
 }
 
@@ -66,7 +66,7 @@ void lis2hh12WriteReg(u8_t reg, u8_t val) {
  */
 void lis2hh12UpdateReg(u8_t reg, u8_t * pRxBuf, u8_t _and, u8_t _or) {
 	xRtosSemaphoreTake(&sLIS2HH12.mux, portMAX_DELAY);
-	halI2C_Queue(sLIS2HH12.psI2C, i2cWRMW_B, &reg, sizeof(reg), pRxBuf, 1,
+	halI2CM_Queue(sLIS2HH12.psI2C, i2cWRMW_B, &reg, sizeof(reg), pRxBuf, 1,
 			(i2cq_p1_t) (uint32_t) _and, (i2cq_p2_t) (uint32_t) _or);
 	xRtosSemaphoreGive(&sLIS2HH12.mux);
 }
@@ -81,7 +81,7 @@ int lis2hh12EventHandler(void) {
 
 // #################################  IRMACOS sensor task support ##################################
 
-int	lis2hh12ReadHdlrAccel(epw_t * psEWP) {
+int	lis2hh12Sense(epw_t * psEWP) {
 	IF_SYSTIMER_START(debugTIMING, stLIS2HH12);
 	lis2hh12ReadRegs(lis2hh12STATUS, (u8_t *) &sLIS2HH12.Reg.STATUS, 7);
 	IF_SYSTIMER_STOP(debugTIMING, stLIS2HH12);
