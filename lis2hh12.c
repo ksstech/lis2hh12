@@ -186,17 +186,17 @@ int	lis2hh12Config(i2c_di_t * psI2C_DI) {
 #endif
 
 	epw_t * psEWP = &table_work[URI_LIS2HH12_X];
-	psEWP->var.def = SETDEF_CVAR(0, 0, vtVALUE, cvF32, 1);
+	psEWP->var.def = SETDEF_CVAR(0, 0, vtVALUE, cvF32, 1, 0);
 	psEWP->Tsns = psEWP->Rsns = LIS2HH12_T_SNS;
 	psEWP->uri = URI_LIS2HH12_X;
 
 	psEWP = &table_work[URI_LIS2HH12_Y];
-	psEWP->var.def = SETDEF_CVAR(0, 0, vtVALUE, cvF32, 1);
+	psEWP->var.def = SETDEF_CVAR(0, 0, vtVALUE, cvF32, 1, 0);
 	psEWP->Tsns = psEWP->Rsns = LIS2HH12_T_SNS;
 	psEWP->uri = URI_LIS2HH12_Y;
 
 	psEWP = &table_work[URI_LIS2HH12_Z];
-	psEWP->var.def = SETDEF_CVAR(0, 0, vtVALUE, cvF32, 1);
+	psEWP->var.def = SETDEF_CVAR(0, 0, vtVALUE, cvF32, 1, 0);
 	psEWP->Tsns = psEWP->Rsns = LIS2HH12_T_SNS;
 	psEWP->uri = URI_LIS2HH12_Z;
 
