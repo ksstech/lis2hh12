@@ -49,8 +49,7 @@ lis2hh12_t sLIS2HH12 = { 0 };
 
 void lis2hh12ReadRegs(u8_t Reg, u8_t * pRxBuf, size_t RxSize) {
 	xRtosSemaphoreTake(&sLIS2HH12.mux, portMAX_DELAY);
-	halI2CM_Queue(sLIS2HH12.psI2C, i2cWR_B, &Reg, sizeof(Reg),
-			pRxBuf, RxSize, (i2cq_p1_t) NULL, (i2cq_p2_t) NULL);
+	halI2CM_Queue(sLIS2HH12.psI2C, i2cWR_B, &Reg, sizeof(Reg), pRxBuf, RxSize, (i2cq_p1_t) NULL, (i2cq_p2_t) NULL);
 	xRtosSemaphoreGive(&sLIS2HH12.mux);
 }
 
@@ -62,12 +61,11 @@ void lis2hh12WriteReg(u8_t reg, u8_t val) {
 }
 
 /**
- * perform a Write-Modify-Read transaction, also updates local register value
+ * @brief	perform a Write-Read-Modify-Write transaction, also updates local register value
  */
 void lis2hh12UpdateReg(u8_t reg, u8_t * pRxBuf, u8_t _and, u8_t _or) {
 	xRtosSemaphoreTake(&sLIS2HH12.mux, portMAX_DELAY);
-	halI2CM_Queue(sLIS2HH12.psI2C, i2cWRMW_B, &reg, sizeof(reg), pRxBuf, 1,
-			(i2cq_p1_t) (uint32_t) _and, (i2cq_p2_t) (uint32_t) _or);
+	halI2CM_Queue(sLIS2HH12.psI2C, i2cWRMW_B, &reg, sizeof(reg), pRxBuf, 1, (i2cq_p1_t) (uint32_t) _and, (i2cq_p2_t) (uint32_t) _or);
 	xRtosSemaphoreGive(&sLIS2HH12.mux);
 }
 
