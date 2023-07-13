@@ -208,23 +208,23 @@ int	lis2hh12Diags(i2c_di_t * psI2C_DI) { return erSUCCESS; }
 
 // ######################################### Reporting #############################################
 
-void lis2hh12ReportAll(void) {
-	halI2C_DeviceReport(sLIS2HH12.psI2C);
-	P("\tACT_THS: 0x%02X (%dmg) \r\n", sLIS2HH12.Reg.ACT_THS, sLIS2HH12.Reg.ACT_THS*(fs_scale[sLIS2HH12.Reg.ctrl4.fs]/128));
-	P("\tACT_DUR: 0x%02X (%ds) \r\n", sLIS2HH12.Reg.ACT_DUR, sLIS2HH12.Reg.ACT_DUR);
-	P("\tCTRL1: 0x%02X  hr=%d  odr=%d (%dHz) bdu=%d  Zen=%d  Yen=%d  Xen=%d\r\n", sLIS2HH12.Reg.CTRL1,
+void lis2hh12ReportAll(report_t * psR) {
+	halI2C_DeviceReport(psR, sLIS2HH12.psI2C);
+	wprintfx(psR, "\tACT_THS: 0x%02X (%dmg) \r\n", sLIS2HH12.Reg.ACT_THS, sLIS2HH12.Reg.ACT_THS*(fs_scale[sLIS2HH12.Reg.ctrl4.fs]/128));
+	wprintfx(psR, "\tACT_DUR: 0x%02X (%ds) \r\n", sLIS2HH12.Reg.ACT_DUR, sLIS2HH12.Reg.ACT_DUR);
+	wprintfx(psR, "\tCTRL1: 0x%02X  hr=%d  odr=%d (%dHz) bdu=%d  Zen=%d  Yen=%d  Xen=%d\r\n", sLIS2HH12.Reg.CTRL1,
 		sLIS2HH12.Reg.ctrl1.hr, sLIS2HH12.Reg.ctrl1.odr, odr_scale[sLIS2HH12.Reg.ctrl1.odr],
 		sLIS2HH12.Reg.ctrl1.bdu,
 		sLIS2HH12.Reg.ctrl1.zen, sLIS2HH12.Reg.ctrl1.yen, sLIS2HH12.Reg.ctrl1.xen);
-	P("\tCTRL4: 0x%02X  bw=%d  fs=%d (%dG)  bws_odr=%d  IAinc=%d  I2Cen=%d  sim=%d\r\n", sLIS2HH12.Reg.CTRL4,
+	wprintfx(psR, "\tCTRL4: 0x%02X  bw=%d  fs=%d (%dG)  bws_odr=%d  IAinc=%d  I2Cen=%d  sim=%d\r\n", sLIS2HH12.Reg.CTRL4,
 		sLIS2HH12.Reg.ctrl4.bw, sLIS2HH12.Reg.ctrl4.fs, fs_scale[sLIS2HH12.Reg.ctrl4.fs]/1000,
 		sLIS2HH12.Reg.ctrl4.bw_scale_odr,
 		sLIS2HH12.Reg.ctrl4.if_add_inc,
 		sLIS2HH12.Reg.ctrl4.i2c_enable,
 		sLIS2HH12.Reg.ctrl4.sim);
-	P("\tCTRL5: 0x%02X  debug=%d  reset=%d  dec=%d  st=%d  HLactive=%d  pp_od=%d\r\n", sLIS2HH12.Reg.CTRL5,
+	wprintfx(psR, "\tCTRL5: 0x%02X  debug=%d  reset=%d  dec=%d  st=%d  HLactive=%d  pp_od=%d\r\n", sLIS2HH12.Reg.CTRL5,
 		sLIS2HH12.Reg.ctrl5.debug, sLIS2HH12.Reg.ctrl5.soft_reset, sLIS2HH12.Reg.ctrl5.dec,
 		sLIS2HH12.Reg.ctrl5.st, sLIS2HH12.Reg.ctrl5.h_lactive, sLIS2HH12.Reg.ctrl5.pp_od);
-//	P("I1: 0x%02x  I2: 0x%02x\r\n", sLIS2HH12.Reg.IG_SRC1, sLIS2HH12.Reg.IG_SRC2);
+//	wprintfx(psR, "I1: 0x%02x  I2: 0x%02x\r\n", sLIS2HH12.Reg.IG_SRC1, sLIS2HH12.Reg.IG_SRC2);
 }
 #endif
