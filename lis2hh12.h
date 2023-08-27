@@ -131,10 +131,10 @@ typedef struct __attribute__((packed)) {				// STATUS
 	u8_t yda : 1;
 	u8_t zda : 1;
 	u8_t zyxda : 1;
-	u8_t xor : 1;
-	u8_t yor : 1;
-	u8_t zor : 1;
-	u8_t zyxor: 1;
+	u8_t Xor : 1;
+	u8_t Yor : 1;
+	u8_t Zor : 1;
+	u8_t ZYXor: 1;
 } lis2hh12_status_t;
 
 typedef struct __attribute__((packed)) {				// FIFO_CTRL
