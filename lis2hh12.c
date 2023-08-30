@@ -150,35 +150,40 @@ int	lis2hh12ConfigMode (struct rule_t * psR, int Xcur, int Xmax, int EI) {
  * device reset+register reads to ascertain exact device type
  * @return	erSUCCESS if supported device was detected, if not erFAILURE
  */
-int	lis2hh12Identify(i2c_di_t * psI2C_DI) {
-	psI2C_DI->TRXmS	= 50;
-	psI2C_DI->CLKuS = 400;
-	psI2C_DI->Test = 1;
-	sLIS2HH12.psI2C = psI2C_DI;
+int	lis2hh12Identify(i2c_di_t * psI2C) {
+	psI2C->TRXmS	= 50;
+	psI2C->CLKuS = 400;
+	psI2C->Test = 1;
+	sLIS2HH12.psI2C = psI2C;
 
 	u8_t U8;
 	int iRV;
 	lis2hh12ReadRegs(lis2hh12WHO_AM_I, &U8, sizeof(U8));
 	IF_EXIT_X(U8 != lis2hh12WHOAMI_NUM, erFAILURE);
-	psI2C_DI->Type		= i2cDEV_LIS2HH12;
-	psI2C_DI->Speed		= i2cSPEED_400;
-	psI2C_DI->DevIdx 	= 0;
+	psI2C->Type		= i2cDEV_LIS2HH12;
+	psI2C->Speed		= i2cSPEED_400;
+	psI2C->DevIdx 	= 0;
 	iRV = erSUCCESS;
 exit:
-	psI2C_DI->Test = 0;
+	psI2C->Test = 0;
 	return iRV ;
 }
 
-int	lis2hh12Config(i2c_di_t * psI2C_DI) {
-#if 1
+int	lis2hh12Config(i2c_di_t * psI2C) {
+	IF_SYSTIMER_INIT(debugTIMING, stLIS2HH12, stMICROS, "LIS2HH12", 500, 1500);
+	return lis2hh12ReConfig(psI2C);
+}
+
+int lis2hh12ReConfig(i2c_di_t * psI2C) {
+	#if 1
 	// enable device
 	lis2hh12UpdateReg(lis2hh12CTRL1, &sLIS2HH12.Reg.CTRL1, 0xFF, 0x3F); 	// XYZen ODR=100Hz BDU
 	// enable In/Activity interrupt
 	lis2hh12UpdateReg(lis2hh12CTRL3, &sLIS2HH12.Reg.CTRL3, 0xFF, 1 << 5);	// INT1_INACT
-#else
+	#else
 	lis2hh12WriteReg(lis2hh12CTRL1, sLIS2HH12.Reg.CTRL1 = 0x3F); 			// ODR = 10Hz
 	lis2hh12WriteReg(lis2hh12CTRL3, sLIS2HH12.Reg.CTRL3 = 0x20);			// INT1_INACT
-#endif
+	#endif
 
 	epw_t * psEWP = &table_work[URI_LIS2HH12_X];
 	psEWP->var.def = SETDEF_CVAR(0, 0, vtVALUE, cvF32, 1, 0);
@@ -194,14 +199,10 @@ int	lis2hh12Config(i2c_di_t * psI2C_DI) {
 	psEWP->var.def = SETDEF_CVAR(0, 0, vtVALUE, cvF32, 1, 0);
 	psEWP->Tsns = psEWP->Rsns = LIS2HH12_T_SNS;
 	psEWP->uri = URI_LIS2HH12_Z;
-
-	IF_SYSTIMER_INIT(debugTIMING, stLIS2HH12, stMICROS, "LIS2HH12", 500, 1500);
-	return erSUCCESS ;
+	return erSUCCESS;
 }
 
-int lis2hh12ReConfig(i2c_di_t * psI2C_DI) { return erSUCCESS; }
-
-int	lis2hh12Diags(i2c_di_t * psI2C_DI) { return erSUCCESS; }
+int	lis2hh12Diags(i2c_di_t * psI2C) { return erSUCCESS; }
 
 // ######################################### Reporting #############################################
 
