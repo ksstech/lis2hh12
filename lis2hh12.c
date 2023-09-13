@@ -1,15 +1,12 @@
 /*
- * lis12hh12.c
- * Copyright (c0 2022 Andre M. Maree / KSS Technologies (Pty) Ltd.
+ * lis2hh12.c - Copyright (c) 2022-23 Andre M. Maree / KSS Technologies (Pty) Ltd.
  */
 
-#include "hal_config.h"
+#include "endpoints.h"
 
 #if (halHAS_LIS2HH12 > 0)
-#include "lis2hh12.h"
-#include "hal_gpio.h"
-#include "endpoints.h"
-#include "options.h"
+
+#include "hal_i2c_common.h"
 #include "printfx.h"
 #include "rules.h"
 #include "syslog.h"

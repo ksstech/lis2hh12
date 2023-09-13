@@ -1,12 +1,8 @@
 /*
- * Copyright 2022 Andre M. Maree/KSS Technologies (Pty) Ltd.
+ * lis2hh12.h - Copyright (c) 2022-23 Andre M. Maree/KSS Technologies (Pty) Ltd.
  */
 
 #pragma once
-
-#include "hal_i2c_common.h"
-#include "endpoints.h"
-#include <stdint.h>
 
 #ifdef __cplusplus
 	extern "C" {
@@ -242,18 +238,19 @@ typedef struct {
 // ###################################### Public functions #########################################
 
 int lis2hh12EventHandler(void);
-
-int	lis2hh12Identify(i2c_di_t * psI2C);
-int	lis2hh12Config(i2c_di_t * psI2C);
-int	lis2hh12ReConfig(i2c_di_t * psI2C);
-int	lis2hh12Diags(i2c_di_t * psI2C);
-void lis2hh12ReportAll(report_t * psR);
+struct i2c_di_t;
+int	lis2hh12Identify(struct i2c_di_t * psI2C);
+int	lis2hh12Config(struct i2c_di_t * psI2C);
+int	lis2hh12ReConfig(struct i2c_di_t * psI2C);
+int	lis2hh12Diags(struct i2c_di_t * psI2C);
+struct report_t;
+void lis2hh12ReportAll(struct report_t * psR);
 
 struct rule_t;
 int	lis2hh12ConfigMode (struct rule_t *, int Xcur, int Xmax, int EI);
 
 struct epw_t;
-int	lis2hh12Sense(epw_t * psEWP);
+int	lis2hh12Sense(struct epw_t * psEWP);
 
 #ifdef __cplusplus
 	}
