@@ -196,6 +196,7 @@ int lis2hh12ReConfig(i2c_di_t * psI2C) {
 	psEWP->var.def = SETDEF_CVAR(0, 0, vtVALUE, cvF32, 1, 0);
 	psEWP->Tsns = psEWP->Rsns = LIS2HH12_T_SNS;
 	psEWP->uri = URI_LIS2HH12_Z;
+	xRtosSetDevice(devMASK_LIS2HH12);
 	return erSUCCESS;
 }
 
