@@ -57,173 +57,183 @@ enum {
 
 // ######################################### Structures ############################################
 
-typedef struct __attribute__((packed)) {				// CTRL1
-	u8_t xen : 1;
-	u8_t yen : 1;
-	u8_t zen : 1;
-	u8_t bdu : 1;
-	u8_t odr : 3;				// 0 = off, 10->800Hz
-	u8_t hr : 1;					// 1 = high resolution enabled
+typedef union __attribute__((packed)) {				// CTRL1
+	struct __attribute__((packed)) { u8_t en:3; u8_t bdu:1; u8_t odr:3; u8_t hr:1; };
+	struct __attribute__((packed)) { u8_t xen:1; u8_t yen:1; u8_t zen:1; u8_t oth:5; };
 } lis2hh12_ctrl1_t;
+DUMB_STATIC_ASSERT(sizeof(lis2hh12_ctrl1_t) == 1);
 
 typedef struct __attribute__((packed)) {				// CTRL2
-	u8_t hpis2 : 1;
-	u8_t hpis1 : 1;
-	u8_t fds : 1;
-	u8_t hpm : 2;
-	u8_t dfc1 : 2;
-	u8_t res : 1;
+	u8_t hpis2:1;
+	u8_t hpis1:1;
+	u8_t fds:1;
+	u8_t hpm:2;
+	u8_t dfc1:2;
+	u8_t res:1;
 } lis2hh12_ctrl2_t;
+DUMB_STATIC_ASSERT(sizeof(lis2hh12_ctrl2_t) == 1);
 
 typedef struct __attribute__((packed)) {				// CTRL3
-	u8_t int1_drdy : 1;
-	u8_t int1_fth : 1;
-	u8_t int1_ovr : 1;
-	u8_t int1_ig1 : 1;
-	u8_t int1_ig2 : 1;
-	u8_t int1_inact : 1;
-	u8_t stop_fth : 1;
-	u8_t fifo_en : 1;
+	u8_t int1_drdy:1;
+	u8_t int1_fth:1;
+	u8_t int1_ovr:1;
+	u8_t int1_ig1:1;
+	u8_t int1_ig2:1;
+	u8_t int1_inact:1;
+	u8_t stop_fth:1;
+	u8_t fifo_en:1;
 } lis2hh12_ctrl3_t;
+DUMB_STATIC_ASSERT(sizeof(lis2hh12_ctrl3_t) == 1);
 
 typedef struct __attribute__((packed)) {				// CTRL4
-	u8_t sim : 1;
-	u8_t i2c_enable : 1;
-	u8_t if_add_inc : 1;
-	u8_t bw_scale_odr : 1;
-	u8_t fs : 2;
-	u8_t bw : 2;
+	u8_t sim:1;
+	u8_t i2c_enable:1;
+	u8_t if_add_inc:1;
+	u8_t bw_scale_odr:1;
+	u8_t fs:2;
+	u8_t bw:2;
 } lis2hh12_ctrl4_t;
+DUMB_STATIC_ASSERT(sizeof(lis2hh12_ctrl4_t) == 1);
 
 typedef struct __attribute__((packed)) {				// CTRL5
-	u8_t pp_od : 1;
-	u8_t h_lactive : 1;
-	u8_t st : 2;
-	u8_t dec : 2;
-	u8_t soft_reset : 1;
-	u8_t debug : 1;
+	u8_t pp_od:1;
+	u8_t h_lactive:1;
+	u8_t st:2;
+	u8_t dec:2;
+	u8_t soft_reset:1;
+	u8_t debug:1;
 } lis2hh12_ctrl5_t;
+DUMB_STATIC_ASSERT(sizeof(lis2hh12_ctrl5_t) == 1);
 
 typedef struct __attribute__((packed)) {				// CTRL6
-	u8_t int2_drdy : 1;
-	u8_t int_fth : 1;
-	u8_t int_empty : 1;
-	u8_t int2_ig1 : 1;
-	u8_t int2_ig2 : 1;
-	u8_t int2_boot : 1;
-	u8_t res : 1;
-	u8_t boot : 1;
+	u8_t int2_drdy:1;
+	u8_t int_fth:1;
+	u8_t int_empty:1;
+	u8_t int2_ig1:1;
+	u8_t int2_ig2:1;
+	u8_t int2_boot:1;
+	u8_t res:1;
+	u8_t boot:1;
 } lis2hh12_ctrl6_t;
+DUMB_STATIC_ASSERT(sizeof(lis2hh12_ctrl6_t) == 1);
 
 typedef struct __attribute__((packed)) {				// CTRL7
-	u8_t _4d_ig : 2;
-	u8_t lir : 2;
-	u8_t dcrm : 2;
-	u8_t res : 2;
+	u8_t _4d_ig:2;
+	u8_t lir:2;
+	u8_t dcrm:2;
+	u8_t res:2;
 } lis2hh12_ctrl7_t;
+DUMB_STATIC_ASSERT(sizeof(lis2hh12_ctrl7_t) == 1);
 
 typedef struct __attribute__((packed)) {				// STATUS
-	u8_t xda : 1;
-	u8_t yda : 1;
-	u8_t zda : 1;
-	u8_t zyxda : 1;
-	u8_t Xor : 1;
-	u8_t Yor : 1;
-	u8_t Zor : 1;
-	u8_t ZYXor: 1;
+	u8_t xda:1;
+	u8_t yda:1;
+	u8_t zda:1;
+	u8_t zyxda:1;
+	u8_t Xor:1;
+	u8_t Yor:1;
+	u8_t Zor:1;
+	u8_t ZYXor:1;
 } lis2hh12_status_t;
+DUMB_STATIC_ASSERT(sizeof(lis2hh12_status_t) == 1);
 
 typedef struct __attribute__((packed)) {				// FIFO_CTRL
-	u8_t fth : 5;
+	u8_t fth:5;
 	u8_t fmode: 3;
 } lis2hh12_fifo_ctrl_t;
+DUMB_STATIC_ASSERT(sizeof(lis2hh12_fifo_ctrl_t) == 1);
 
 typedef struct __attribute__((packed)) {				// FIFO_SRC
-	u8_t fss : 5;
-	u8_t empty: 1;
-	u8_t ovr: 1;
-	u8_t fth: 1;
+	u8_t fss:5;
+	u8_t empty:1;
+	u8_t ovr:1;
+	u8_t fth:1;
 } lis2hh12_fifo_src_t;
+DUMB_STATIC_ASSERT(sizeof(lis2hh12_fifo_src_t) == 1);
 
-typedef struct __attribute__((packed)) {				// REGS
-	u8_t ACT_THS;
-	u8_t ACT_DUR;
-	union {							// CTRL1
-		lis2hh12_ctrl1_t ctrl1;
-		u8_t CTRL1;
+typedef union {						// REGS
+	struct __attribute__((packed)) {
+		union { u8_t TEMPX[2]; u16_t TEMP; };
+		u8_t ACT_THS;
+		u8_t ACT_DUR;
+		union {							// CTRL1
+			lis2hh12_ctrl1_t ctrl1;
+			u8_t CTRL1;
+		};
+		union {							// CTRL2
+			lis2hh12_ctrl2_t ctrl2;
+			u8_t CTRL2;
+		};
+		union {							// CTRL3
+			lis2hh12_ctrl3_t ctrl3;
+			u8_t CTRL3;
+		};
+		union {							// CTRL4
+			lis2hh12_ctrl4_t ctrl4;
+			u8_t CTRL4;
+		};
+		union {							// CTRL5
+			lis2hh12_ctrl5_t ctrl5;
+			u8_t CTRL5;
+		};
+		union {							// CTRL6
+			lis2hh12_ctrl6_t ctrl6;
+			u8_t CTRL6;
+		};
+		union {							// CTRL7
+			lis2hh12_ctrl7_t ctrl7;
+			u8_t CTRL7;
+		};
+		union {							// STATUS
+			lis2hh12_status_t status;
+			u8_t STATUS;
+		};
+		union {							// OUT_X
+			u16_t u16OUT_X;
+			u8_t u8OUT_X[2];
+		};
+		union {							// OUT_Y
+			u16_t u16OUT_Y;
+			u8_t u8OUT_Y[2];
+		};
+		union {							// OUT_Z
+			u16_t u16OUT_Z;
+			u8_t u8OUT_Z[2];
+		};
+		union {							// FIFO_CTRL
+			lis2hh12_fifo_ctrl_t fifo_ctrl;
+			u8_t FIFO_CTRL;
+		};
+		union {							// FIFO_SRC
+			lis2hh12_fifo_src_t fifo_src;
+			u8_t FIFO_SRC;
+		};
+		u8_t IG_CFG1;
+		u8_t IG_SRC1;
+		u8_t IG_THS_X1;
+		u8_t IG_THS_Y1;
+		u8_t IG_THS_Z1;
+		u8_t IG_DUR1;
+		u8_t IG_CFG2;
+		u8_t IG_SRC2;
+		u8_t IG_THS2;
+		u8_t IG_DUR2;
+		union {							// REF_X
+			u16_t u16REF_X;
+			u8_t u8REF_X[2];
+		};
+		union {							// REF_Y
+			u16_t u16REF_Y;
+			u8_t u8REF_Y[2];
+		};
+		union {							// REF_Z
+			u16_t u16REF_Z;
+			u8_t u8REF_Z[2];
+		};
 	};
-	union {							// CTRL2
-		lis2hh12_ctrl2_t ctrl2;
-		u8_t CTRL2;
-	};
-	union {							// CTRL3
-		lis2hh12_ctrl3_t ctrl3;
-		u8_t CTRL3;
-	};
-	union {							// CTRL4
-		lis2hh12_ctrl4_t ctrl4;
-		u8_t CTRL4;
-	};
-	union {							// CTRL5
-		lis2hh12_ctrl5_t ctrl5;
-		u8_t CTRL5;
-	};
-	union {							// CTRL6
-		lis2hh12_ctrl6_t ctrl6;
-		u8_t CTRL6;
-	};
-	union {							// CTRL7
-		lis2hh12_ctrl7_t ctrl7;
-		u8_t CTRL7;
-	};
-	union {							// STATUS
-		lis2hh12_status_t status;
-		u8_t STATUS;
-	};
-	union {							// OUT_X
-		u16_t u16OUT_X;
-		u8_t u8OUT_X[2];
-	};
-	union {							// OUT_Y
-		u16_t u16OUT_Y;
-		u8_t u8OUT_Y[2];
-	};
-	union {							// OUT_Z
-		u16_t u16OUT_Z;
-		u8_t u8OUT_Z[2];
-	};
-	union {							// FIFO_CTRL
-		lis2hh12_fifo_ctrl_t fifo_ctrl;
-		u8_t FIFO_CTRL;
-	};
-	union {							// FIFO_SRC
-		lis2hh12_fifo_src_t fifo_src;
-		u8_t FIFO_SRC;
-	};
-	u8_t IG_CFG1;
-	u8_t IG_SRC1;
-	u8_t IG_THS_X1;
-	u8_t IG_THS_Y1;
-	u8_t IG_THS_Z1;
-	u8_t IG_DUR1;
-	u8_t IG_CFG2;
-	u8_t IG_SRC2;
-	u8_t IG_THS2;
-	u8_t IG_DUR2;
-	union {							// REF_X
-		u16_t u16REF_X;
-		u8_t u8REF_X[2];
-	};
-	union {							// REF_Y
-		u16_t u16REF_Y;
-		u8_t u8REF_Y[2];
-	};
-	union {							// REF_Z
-		u16_t u16REF_Z;
-		u8_t u8REF_Z[2];
-	};
+	u8_t Regs[36];
 } lis2hh12_reg_t;
-DUMB_STATIC_ASSERT(sizeof(lis2hh12_reg_t) == 34);
+DUMB_STATIC_ASSERT(sizeof(lis2hh12_reg_t) == 36);
 
 struct i2c_di_t;
 typedef struct {
@@ -235,20 +245,23 @@ typedef struct {
 
 // ###################################### Public variables #########################################
 
+extern const u16_t fs_scale[];
+extern const u16_t odr_scale[];
+extern lis2hh12_t sLIS2HH12;
 
 // ###################################### Public functions #########################################
 
+int lis2hh12ReadRegs(u8_t Reg, u8_t * pRxBuf, size_t RxSize);
+int lis2hh12WriteReg(u8_t reg, u8_t val);
+int lis2hh12UpdateReg(u8_t reg, u8_t * pRxBuf, u8_t _and, u8_t _or);
+
+void lis2hh12ReadTrigger(void * Arg);
 int lis2hh12EventHandler(void);
 struct i2c_di_t;
 int	lis2hh12Identify(struct i2c_di_t * psI2C);
 int	lis2hh12Config(struct i2c_di_t * psI2C);
 int	lis2hh12Diags(struct i2c_di_t * psI2C);
 
-struct rule_t;
-int	lis2hh12ConfigMode (struct rule_t *, int Xcur, int Xmax, int EI);
-
-struct epw_t;
-int	lis2hh12Sense(struct epw_t * psEWP);
 struct report_t;
 int lis2hh12ReportIG_SRC(report_t * psR);
 int lis2hh12ReportAll(struct report_t * psR);
