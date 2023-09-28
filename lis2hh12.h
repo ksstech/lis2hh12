@@ -243,14 +243,15 @@ struct i2c_di_t;
 int	lis2hh12Identify(struct i2c_di_t * psI2C);
 int	lis2hh12Config(struct i2c_di_t * psI2C);
 int	lis2hh12Diags(struct i2c_di_t * psI2C);
-struct report_t;
-void lis2hh12ReportAll(struct report_t * psR);
 
 struct rule_t;
 int	lis2hh12ConfigMode (struct rule_t *, int Xcur, int Xmax, int EI);
 
 struct epw_t;
 int	lis2hh12Sense(struct epw_t * psEWP);
+struct report_t;
+int lis2hh12ReportIG_SRC(report_t * psR);
+int lis2hh12ReportAll(struct report_t * psR);
 
 #ifdef __cplusplus
 	}
