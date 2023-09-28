@@ -74,71 +74,12 @@ int lis2hh12EventHandler(void) {
 	return kwNULL;					// no/unknown event
 }
 
-// #################################  IRMACOS sensor task support ##################################
-
-int	lis2hh12Sense(epw_t * psEWP) {
 	IF_SYSTIMER_START(debugTIMING, stLIS2HH12);
-	lis2hh12ReadRegs(lis2hh12STATUS, (u8_t *) &sLIS2HH12.Reg.STATUS, 7);
 	IF_SYSTIMER_STOP(debugTIMING, stLIS2HH12);
-	x64_t X64;
-	X64.x32[1].f32 = (float) fs_scale[sLIS2HH12.Reg.ctrl4.fs] / 65536000.0;
-	X64.x32[0].f32 = (float) sLIS2HH12.Reg.u16OUT_X * X64.x32[1].f32;
-	vCV_SetValueRaw(&table_work[URI_LIS2HH12_X].var, X64);
-	X64.x32[0].f32 = (float) sLIS2HH12.Reg.u16OUT_Y * X64.x32[1].f32;
-	vCV_SetValueRaw(&table_work[URI_LIS2HH12_Y].var, X64);
-	X64.x32[0].f32 = (float) sLIS2HH12.Reg.u16OUT_Z * X64.x32[1].f32;
-	vCV_SetValueRaw(&table_work[URI_LIS2HH12_Z].var, X64);
-//	P("lis2hh12  [ %-'B ]\r\n", 7, &sLIS2HH12.Reg.STATUS);
-	IF_P(ioB1GET(dbgLIS2HH12) && sLIS2HH12.Reg.status.ZYXor, "LIS2HH12 ZYX overrun");
-	return erSUCCESS;
 }
 
-// ################################ Rules configuration support ####################################
-
-/**
- * Mode	0 = normal ths dur odr hr [etc]
- *		1 = [In]/Active
- *		2 = freefall
- *		3 = orientation 4D portrait/landscape
- *		4 = orientation 6D
- *		5 = stream using FIFO
- */
-enum {
-	lis2hh12M_NORMAL,
-	lis2hh12M_MOVEMENT,
-	lis2hh12M_FREEFAAL,
-	lis2hh12M_ORIENT4D,
-	lis2hh12M_ORIENT6D,
-	lis2hh12M_STREAM,
-};
-
-int	lis2hh12ConfigMode (struct rule_t * psR, int Xcur, int Xmax, int EI) {
-	// mode /lis2hh12 idx ths dur odr hr
-	u8_t AI = psR->ActIdx;
-	i32_t mode = psR->actPar1[AI];
-	i32_t ths = psR->para.x32[AI][0].i32;
-	i32_t dur = psR->para.x32[AI][1].i32;
-	i32_t odr = psR->para.x32[AI][2].i32;
-	i32_t hr = psR->para.x32[AI][3].i32;
-	IF_P(debugTRACK && ioB1GET(dbgMode), "lis2hh12: Xcur=%d Xmax=%d ths=%ld dur=%ld odr=%ld hr=%ld\r\n", Xcur, Xmax, ths, dur, odr, hr);
-
-	if (OUTSIDE(lis2hh12M_NORMAL, mode, lis2hh12M_STREAM) ||
-		OUTSIDE(0, ths, 127) ||
-		OUTSIDE(0, dur, 255) ||
-		OUTSIDE(0, odr, 7) ||
-		OUTSIDE(0, hr, 1)) {
-		RETURN_MX("Invalid ths/dur/odr/hr specified", erINV_PARA);
 	}
-	do {
-		lis2hh12WriteReg(lis2hh12ACT_THS, sLIS2HH12.Reg.ACT_THS = ths);
-		lis2hh12WriteReg(lis2hh12ACT_DUR, sLIS2HH12.Reg.ACT_DUR = dur);
-		sLIS2HH12.Reg.ctrl1.hr = hr;
-		sLIS2HH12.Reg.ctrl1.odr = odr;
-		lis2hh12WriteReg(lis2hh12CTRL1, sLIS2HH12.Reg.CTRL1);
-		IF_P(debugTRACK && ioB1GET(dbgMode), "lis2hh12: THS=0x%02X  DUR=0x%02X  CTRL1=ox%02X\r\n",
-				sLIS2HH12.Reg.ACT_THS,sLIS2HH12.Reg.ACT_DUR, sLIS2HH12.Reg.CTRL1);
-	} while (++Xcur < Xmax);
-	return erSUCCESS;
+}
 }
 
 // ################### Identification, Diagnostics & Configuration functions #######################
