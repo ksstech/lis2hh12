@@ -60,10 +60,13 @@ void lis2hh12WriteReg(u8_t reg, u8_t val) {
 /**
  * @brief	perform a Write-Read-Modify-Write transaction, also updates local register value
  */
-void lis2hh12UpdateReg(u8_t reg, u8_t * pRxBuf, u8_t _and, u8_t _or) {
+int lis2hh12UpdateReg(u8_t reg, u8_t * pRxBuf, u8_t _and, u8_t _or) {
 	xRtosSemaphoreTake(&sLIS2HH12.mux, portMAX_DELAY);
-	halI2C_Queue(sLIS2HH12.psI2C, i2cWRMW_BD, &reg, sizeof(reg), pRxBuf, 1, (i2cq_p1_t) (u32_t) _and, (i2cq_p2_t) (u32_t) _or);
+	IF_SYSTIMER_START(debugTIMING, stLIS2HH12);
+	int iRV = halI2C_Queue(sLIS2HH12.psI2C, i2cWRMW, &reg, sizeof(reg), pRxBuf, 1, (i2cq_p1_t) (u32_t) _and, (i2cq_p2_t) (u32_t) _or);
+	IF_SYSTIMER_STOP(debugTIMING, stLIS2HH12);
 	xRtosSemaphoreGive(&sLIS2HH12.mux);
+	return iRV;
 }
 
 // #################################### Interrupt support ##########################################
