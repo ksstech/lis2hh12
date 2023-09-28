@@ -225,8 +225,9 @@ typedef struct __attribute__((packed)) {				// REGS
 } lis2hh12_reg_t;
 DUMB_STATIC_ASSERT(sizeof(lis2hh12_reg_t) == 34);
 
+struct i2c_di_t;
 typedef struct {
-	i2c_di_t * psI2C;
+	struct i2c_di_t * psI2C;
 	SemaphoreHandle_t mux;
 	lis2hh12_reg_t Reg;
 } lis2hh12_t;
@@ -241,7 +242,6 @@ int lis2hh12EventHandler(void);
 struct i2c_di_t;
 int	lis2hh12Identify(struct i2c_di_t * psI2C);
 int	lis2hh12Config(struct i2c_di_t * psI2C);
-int	lis2hh12ReConfig(struct i2c_di_t * psI2C);
 int	lis2hh12Diags(struct i2c_di_t * psI2C);
 struct report_t;
 void lis2hh12ReportAll(struct report_t * psR);

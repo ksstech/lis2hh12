@@ -148,56 +148,75 @@ int	lis2hh12ConfigMode (struct rule_t * psR, int Xcur, int Xmax, int EI) {
  * @return	erSUCCESS if supported device was detected, if not erFAILURE
  */
 int	lis2hh12Identify(i2c_di_t * psI2C) {
-	psI2C->TRXmS	= 50;
-	psI2C->CLKuS = 400;
-	psI2C->Test = 1;
 	sLIS2HH12.psI2C = psI2C;
-
+	psI2C->Type = i2cDEV_LIS2HH12;
+	psI2C->Speed = i2cSPEED_400;
+	psI2C->TObus = 25;
+	psI2C->Test = 1;
 	u8_t U8;
-	int iRV;
-	lis2hh12ReadRegs(lis2hh12WHO_AM_I, &U8, sizeof(U8));
-	IF_EXIT_X(U8 != lis2hh12WHOAMI_NUM, erFAILURE);
-	psI2C->Type		= i2cDEV_LIS2HH12;
-	psI2C->Speed		= i2cSPEED_400;
-	psI2C->DevIdx 	= 0;
-	iRV = erSUCCESS;
-exit:
+//	int iRV = lis2hh12WriteReg(lis2hh12CTRL6, 0x80);	// force REBOOT, must wait till cleared...
+	int iRV = lis2hh12WriteReg(lis2hh12CTRL5, 0x40);	// force SOFT RESET, just in case...
+	if (iRV < erSUCCESS) goto exit;
+
+	iRV = lis2hh12ReadRegs(lis2hh12WHO_AM_I, &U8, sizeof(U8));
+	if (iRV < erSUCCESS) goto exit;
+	if (U8 != lis2hh12WHOAMI_NUM) return erINV_WHOAMI;
+	psI2C->IDok = 1;
 	psI2C->Test = 0;
-	return iRV ;
+exit:
+	return iRV;
 }
 
 int	lis2hh12Config(i2c_di_t * psI2C) {
-	IF_SYSTIMER_INIT(debugTIMING, stLIS2HH12, stMICROS, "LIS2HH12", 500, 1500);
-	return lis2hh12ReConfig(psI2C);
-}
+	if (!psI2C->IDok) return erINV_STATE;
 
-int lis2hh12ReConfig(i2c_di_t * psI2C) {
+	sLIS2HH12.psI2C->CFGok = 0;
+//	psI2C->CFGok = 0;
+	int iRV = lis2hh12ReadRegs(lis2hh12ACT_THS, &sLIS2HH12.Reg.ACT_THS, 20);
+//	int iRV = lis2hh12ReadRegs(lis2hh12ACT_THS, &sLIS2HH12.Reg.ACT_THS, sizeof(lis2hh12_reg_t));
+	if (iRV < erSUCCESS) goto exit;
 	#if 1
-	// enable device
-	lis2hh12UpdateReg(lis2hh12CTRL1, &sLIS2HH12.Reg.CTRL1, 0xFF, 0x3F); 	// XYZen ODR=100Hz BDU
-	// enable In/Activity interrupt
-	lis2hh12UpdateReg(lis2hh12CTRL3, &sLIS2HH12.Reg.CTRL3, 0xFF, 1 << 5);	// INT1_INACT
-	#else
-	lis2hh12WriteReg(lis2hh12CTRL1, sLIS2HH12.Reg.CTRL1 = 0x3F); 			// ODR = 10Hz
-	lis2hh12WriteReg(lis2hh12CTRL3, sLIS2HH12.Reg.CTRL3 = 0x20);			// INT1_INACT
+	iRV = lis2hh12UpdateReg(lis2hh12CTRL1, &sLIS2HH12.Reg.CTRL1, 0xFF, 0x3F); 	// XYZen ODR=100Hz BDU
+	if (iRV < erSUCCESS) goto exit;
+
+	iRV = lis2hh12UpdateReg(lis2hh12CTRL3, &sLIS2HH12.Reg.CTRL3, 0xFF, 0x20);	// INT1_INACT
+	if (iRV < erSUCCESS) goto exit;
+
+	#elif 0
+	iRV = lis2hh12UpdateReg(lis2hh12CTRL1, &sLIS2HH12.Reg.CTRL1, 0xFF, 0x3F); 	// XYZen ODR=100Hz BDU
+	if (iRV < erSUCCESS) goto exit;
+
+	iRV = lis2hh12UpdateReg(lis2hh12IG_CFG1, &sLIS2HH12.Reg.IG_CFG1, 0xFF, 0x3F);	// Z?IE, Y?IE & X?IE
+	if (iRV < erSUCCESS) goto exit;
+
+	iRV = lis2hh12UpdateReg(lis2hh12CTRL3, &sLIS2HH12.Reg.CTRL3, 0xFF, 0x28);		// INT1_INACT & INT1_IG1
+	if (iRV < erSUCCESS) goto exit;
+
+	#elif 0
+	iRV = lis2hh12WriteReg(lis2hh12CTRL1, sLIS2HH12.Reg.CTRL1 = 0x3F); 			// 100Hz BDU XYZen
+	if (iRV < erSUCCESS) goto exit;
+
+	iRV = lis2hh12WriteReg(lis2hh12ACT_THS, sLIS2HH12.Reg.ACT_THS = 0x20);		// 32/128 = 1/4G
+	if (iRV < erSUCCESS) goto exit;
+
+	iRV = lis2hh12WriteReg(lis2hh12ACT_DUR, sLIS2HH12.Reg.ACT_DUR = 0x0C);		// (8*12)/100Hz = 0.96s
+	if (iRV < erSUCCESS) goto exit;
+
+	iRV = lis2hh12WriteReg(lis2hh12CTRL3, sLIS2HH12.Reg.CTRL3 = 0x20);			// INT1_INACT
+	if (iRV < erSUCCESS) goto exit;
 	#endif
-
-	epw_t * psEWP = &table_work[URI_LIS2HH12_X];
-	psEWP->var.def = SETDEF_CVAR(0, 0, vtVALUE, cvF32, 1, 0);
-	psEWP->Tsns = psEWP->Rsns = LIS2HH12_T_SNS;
-	psEWP->uri = URI_LIS2HH12_X;
-
-	psEWP = &table_work[URI_LIS2HH12_Y];
-	psEWP->var.def = SETDEF_CVAR(0, 0, vtVALUE, cvF32, 1, 0);
-	psEWP->Tsns = psEWP->Rsns = LIS2HH12_T_SNS;
-	psEWP->uri = URI_LIS2HH12_Y;
-
-	psEWP = &table_work[URI_LIS2HH12_Z];
-	psEWP->var.def = SETDEF_CVAR(0, 0, vtVALUE, cvF32, 1, 0);
-	psEWP->Tsns = psEWP->Rsns = LIS2HH12_T_SNS;
-	psEWP->uri = URI_LIS2HH12_Z;
-	xRtosSetDevice(devMASK_LIS2HH12);
-	return erSUCCESS;
+	sLIS2HH12.psI2C->CFGok = 1;
+//	psI2C->CFGok = 1;
+	if (psI2C->CFGerr) {
+		IF_SYSTIMER_INIT(debugTIMING, stLIS2HH12, stMICROS, "LIS2HH12", 500, 1500);
+		const gpio_config_t int_pin_cfg = { .pin_bit_mask = 1ULL<<GPIO_NUM_36,
+			.mode = GPIO_MODE_INPUT, .pull_up_en = GPIO_PULLUP_DISABLE,
+			.pull_down_en = GPIO_PULLDOWN_ENABLE, .intr_type = GPIO_INTR_POSEDGE };
+		ESP_ERROR_CHECK(gpio_config(&int_pin_cfg));
+		halGPIO_IRQconfig(lis2hh12IRQ_PIN, lis2hh12IntHandler, NULL);
+	}
+exit:
+	return iRV;
 }
 
 int	lis2hh12Diags(i2c_di_t * psI2C) { return erSUCCESS; }
