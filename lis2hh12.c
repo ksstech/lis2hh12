@@ -2,11 +2,12 @@
  * lis2hh12.c - Copyright (c) 2022-23 Andre M. Maree / KSS Technologies (Pty) Ltd.
  */
 
-#include "endpoints.h"
+#include "hal_config.h"
 
 #if (halHAS_LIS2HH12 > 0)
-
+#include "endpoints.h"
 #include "hal_i2c_common.h"
+#include "lis2hh12.h"
 #include "printfx.h"
 #include "rules.h"
 #include "syslog.h"
@@ -26,7 +27,6 @@
 // #################################### SI7006/13/20/21 Addresses ##################################
 
 #define	lis2hh12ADDR0				0x1E
-#define	LIS2HH12_T_SNS				1000
 
 // ################################ Forward function declaration ###################################
 
