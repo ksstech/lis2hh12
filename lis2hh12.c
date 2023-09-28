@@ -71,12 +71,32 @@ int lis2hh12UpdateReg(u8_t reg, u8_t * pRxBuf, u8_t _and, u8_t _or) {
 
 // #################################### Interrupt support ##########################################
 
+/**
+ *	@brief	Check each input, generate event for every input pulsed
+ *	@brief	Called in context of the I2C task
+ */
+void lis2hh12ReadHandler(void * Arg) {
+	//lis2hh12ReportIG_SRC(NULL);
 }
 
+void lis2hh12ReadTrigger(void * Arg) {
+	u8_t Reg = lis2hh12IG_SRC1;
+	xRtosSemaphoreTake(&sLIS2HH12.mux, portMAX_DELAY);
 	IF_SYSTIMER_START(debugTIMING, stLIS2HH12);
+	halI2C_Queue(sLIS2HH12.psI2C, i2cWRC, &Reg, sizeof(Reg), &sLIS2HH12.Reg.IG_SRC1,
+		SO_MEM(lis2hh12_reg_t, IG_SRC1), (i2cq_p1_t)lis2hh12ReadHandler, (i2cq_p2_t) NULL);
 	IF_SYSTIMER_STOP(debugTIMING, stLIS2HH12);
+	xRtosSemaphoreGive(&sLIS2HH12.mux);
 }
 
+void IRAM_ATTR lis2hh12IntHandler(void * Arg) {
+	#define lis2hh12REQ_TASKS (taskI2C_MASK|taskEVENTS_MASK)
+	EventBits_t xEBrun = xEventGroupGetBitsFromISR(TaskRunState);
+	if ((xEBrun & lis2hh12REQ_TASKS) == lis2hh12REQ_TASKS) {
+		xTaskNotifyFromISR(EventsHandle, 1 << evtLIS2HH12IRQ, eSetBits, NULL);
+		++lis2hh12IRQsOK;
+	} else {
+		++lis2hh12IRQsLost;
 	}
 }
 
