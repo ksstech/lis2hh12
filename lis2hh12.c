@@ -44,17 +44,23 @@ lis2hh12_t sLIS2HH12 = { 0 };
 
 // #################################### Local ONLY functions #######################################
 
-void lis2hh12ReadRegs(u8_t Reg, u8_t * pRxBuf, size_t RxSize) {
+int lis2hh12ReadRegs(u8_t Reg, u8_t * pRxBuf, size_t RxSize) {
 	xRtosSemaphoreTake(&sLIS2HH12.mux, portMAX_DELAY);
-	halI2C_Queue(sLIS2HH12.psI2C, i2cWR_B, &Reg, sizeof(Reg), pRxBuf, RxSize, (i2cq_p1_t) NULL, (i2cq_p2_t) NULL);
+	IF_SYSTIMER_START(debugTIMING, stLIS2HH12);
+	int iRV = halI2C_Queue(sLIS2HH12.psI2C, i2cWR_B, &Reg, sizeof(Reg), pRxBuf, RxSize, (i2cq_p1_t) NULL, (i2cq_p2_t) NULL);
+	IF_SYSTIMER_STOP(debugTIMING, stLIS2HH12);
 	xRtosSemaphoreGive(&sLIS2HH12.mux);
+	return iRV;
 }
 
-void lis2hh12WriteReg(u8_t reg, u8_t val) {
+int lis2hh12WriteReg(u8_t reg, u8_t val) {
 	u8_t u8Buf[2] = { reg, val };
 	xRtosSemaphoreTake(&sLIS2HH12.mux, portMAX_DELAY);
-	halI2C_Queue(sLIS2HH12.psI2C, i2cW, u8Buf, sizeof(u8Buf), NULL, 0, (i2cq_p1_t) NULL, (i2cq_p2_t) NULL);
+	IF_SYSTIMER_START(debugTIMING, stLIS2HH12);
+	int iRV = halI2C_Queue(sLIS2HH12.psI2C, i2cW, u8Buf, sizeof(u8Buf), NULL, 0, (i2cq_p1_t) NULL, (i2cq_p2_t) NULL);
+	IF_SYSTIMER_STOP(debugTIMING, stLIS2HH12);
 	xRtosSemaphoreGive(&sLIS2HH12.mux);
+	return iRV;
 }
 
 /**
