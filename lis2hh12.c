@@ -71,10 +71,6 @@ int lis2hh12UpdateReg(u8_t reg, u8_t * pRxBuf, u8_t _and, u8_t _or) {
 
 // #################################### Interrupt support ##########################################
 
-int lis2hh12EventHandler(void) {
-	if (sLIS2HH12.Reg.ctrl3.int1_inact)
-		return halGDI_GetState(0) ? kwMOVEMENT : kwINACTIVE;
-	return kwNULL;					// no/unknown event
 }
 
 	IF_SYSTIMER_START(debugTIMING, stLIS2HH12);
@@ -83,6 +79,10 @@ int lis2hh12EventHandler(void) {
 
 	}
 }
+
+int lis2hh12EventHandler(void) {
+	if (sLIS2HH12.Reg.ctrl3.int1_inact) return halGDI_GetState(0) ? kwMOVEMENT : kwINACTIVE;
+	return kwNULL;					// no/unknown event
 }
 
 // ################### Identification, Diagnostics & Configuration functions #######################
