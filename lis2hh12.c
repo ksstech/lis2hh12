@@ -33,8 +33,6 @@
 
 // ######################################### Constants #############################################
 
-const gpio_config_t lis2hh12IntPin = { 1ULL<<GPIO_NUM_36, GPIO_MODE_INPUT, GPIO_PULLUP_DISABLE, GPIO_PULLDOWN_DISABLE, GPIO_INTR_DISABLE};
-
 const u16_t fs_scale[4] = { 2000, -1, 4000, 8000 };
 const u16_t odr_scale[8] = { 0, 10, 50, 100, 200, 400, 800, -1 };
 
