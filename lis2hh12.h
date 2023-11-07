@@ -156,58 +156,19 @@ typedef union {						// REGS
 		union { u8_t TEMPX[2]; u16_t TEMP; };
 		u8_t ACT_THS;
 		u8_t ACT_DUR;
-		union {							// CTRL1
-			lis2hh12_ctrl1_t ctrl1;
-			u8_t CTRL1;
-		};
-		union {							// CTRL2
-			lis2hh12_ctrl2_t ctrl2;
-			u8_t CTRL2;
-		};
-		union {							// CTRL3
-			lis2hh12_ctrl3_t ctrl3;
-			u8_t CTRL3;
-		};
-		union {							// CTRL4
-			lis2hh12_ctrl4_t ctrl4;
-			u8_t CTRL4;
-		};
-		union {							// CTRL5
-			lis2hh12_ctrl5_t ctrl5;
-			u8_t CTRL5;
-		};
-		union {							// CTRL6
-			lis2hh12_ctrl6_t ctrl6;
-			u8_t CTRL6;
-		};
-		union {							// CTRL7
-			lis2hh12_ctrl7_t ctrl7;
-			u8_t CTRL7;
-		};
-		union {							// STATUS
-			lis2hh12_status_t status;
-			u8_t STATUS;
-		};
-		union {							// OUT_X
-			u16_t u16OUT_X;
-			u8_t u8OUT_X[2];
-		};
-		union {							// OUT_Y
-			u16_t u16OUT_Y;
-			u8_t u8OUT_Y[2];
-		};
-		union {							// OUT_Z
-			u16_t u16OUT_Z;
-			u8_t u8OUT_Z[2];
-		};
-		union {							// FIFO_CTRL
-			lis2hh12_fifo_ctrl_t fifo_ctrl;
-			u8_t FIFO_CTRL;
-		};
-		union {							// FIFO_SRC
-			lis2hh12_fifo_src_t fifo_src;
-			u8_t FIFO_SRC;
-		};
+		union { lis2hh12_ctrl1_t ctrl1; u8_t CTRL1; };				// CTRL1
+		union { lis2hh12_ctrl2_t ctrl2; u8_t CTRL2; };				// CTRL2
+		union { lis2hh12_ctrl3_t ctrl3; u8_t CTRL3; };				// CTRL3
+		union { lis2hh12_ctrl4_t ctrl4; u8_t CTRL4; };				// CTRL4
+		union { lis2hh12_ctrl5_t ctrl5; u8_t CTRL5; };				// CTRL5
+		union { lis2hh12_ctrl6_t ctrl6; u8_t CTRL6; };				// CTRL6
+		union { lis2hh12_ctrl7_t ctrl7; u8_t CTRL7; };				// CTRL7
+		union { lis2hh12_status_t status; u8_t STATUS; };			// STATUS
+		union { u16_t u16OUT_X; u8_t u8OUT_X[2]; };					// OUT_X
+		union { u16_t u16OUT_Y; u8_t u8OUT_Y[2]; };					// OUT_Y
+		union { u16_t u16OUT_Z; u8_t u8OUT_Z[2]; };					// OUT_Z
+		union { lis2hh12_fifo_ctrl_t fifo_ctrl; u8_t FIFO_CTRL; };	// FIFO_CTRL
+		union { lis2hh12_fifo_src_t fifo_src; u8_t FIFO_SRC; };		// FIFO_SRC
 		u8_t IG_CFG1;
 		u8_t IG_SRC1;
 		u8_t IG_THS_X1;
@@ -218,18 +179,9 @@ typedef union {						// REGS
 		u8_t IG_SRC2;
 		u8_t IG_THS2;
 		u8_t IG_DUR2;
-		union {							// REF_X
-			u16_t u16REF_X;
-			u8_t u8REF_X[2];
-		};
-		union {							// REF_Y
-			u16_t u16REF_Y;
-			u8_t u8REF_Y[2];
-		};
-		union {							// REF_Z
-			u16_t u16REF_Z;
-			u8_t u8REF_Z[2];
-		};
+		union { u16_t u16REF_X; u8_t u8REF_X[2]; };					// REF_X
+		union { u16_t u16REF_Y; u8_t u8REF_Y[2]; };					// REF_Y
+		union { u16_t u16REF_Z; u8_t u8REF_Z[2]; };					// REF_Z
 	};
 	u8_t Regs[36];
 } lis2hh12_reg_t;
