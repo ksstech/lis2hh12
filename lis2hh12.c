@@ -138,9 +138,7 @@ exit:
 
 int	lis2hh12Config(i2c_di_t * psI2C) {
 	if (!psI2C->IDok) return erINV_STATE;
-
-	sLIS2HH12.psI2C->CFGok = 0;
-//	psI2C->CFGok = 0;
+	psI2C->CFGok = 0;
 	int iRV = lis2hh12ReadRegs(lis2hh12ACT_THS, &sLIS2HH12.Reg.ACT_THS, 20);
 //	int iRV = lis2hh12ReadRegs(lis2hh12ACT_THS, &sLIS2HH12.Reg.ACT_THS, sizeof(lis2hh12_reg_t));
 	if (iRV < erSUCCESS) goto exit;
@@ -174,8 +172,7 @@ int	lis2hh12Config(i2c_di_t * psI2C) {
 	iRV = lis2hh12WriteReg(lis2hh12CTRL3, sLIS2HH12.Reg.CTRL3 = 0x20);			// INT1_INACT
 	if (iRV < erSUCCESS) goto exit;
 	#endif
-	sLIS2HH12.psI2C->CFGok = 1;
-//	psI2C->CFGok = 1;
+	psI2C->CFGok = 1;
 	if (psI2C->CFGerr) {
 		IF_SYSTIMER_INIT(debugTIMING, stLIS2HH12, stMICROS, "LIS2HH12", 500, 1500);
 		const gpio_config_t int_pin_cfg = { .pin_bit_mask = 1ULL<<GPIO_NUM_36,
