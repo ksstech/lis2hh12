@@ -173,12 +173,16 @@ int	lis2hh12Config(i2c_di_t * psI2C) {
 	if (iRV < erSUCCESS) goto exit;
 	#endif
 	psI2C->CFGok = 1;
-	if (psI2C->CFGerr) {
+	if (!psI2C->CFGerr) {
 		IF_SYSTIMER_INIT(debugTIMING, stLIS2HH12, stMICROS, "LIS2HH12", 500, 1500);
-		const gpio_config_t int_pin_cfg = { .pin_bit_mask = 1ULL<<GPIO_NUM_36,
-			.mode = GPIO_MODE_INPUT, .pull_up_en = GPIO_PULLUP_DISABLE,
-			.pull_down_en = GPIO_PULLDOWN_ENABLE, .intr_type = GPIO_INTR_POSEDGE };
-		ESP_ERROR_CHECK(gpio_config(&int_pin_cfg));
+		const gpio_config_t irq_pin_cfg = {
+			.pin_bit_mask = 1ULL<<GPIO_NUM_36,
+			.mode = GPIO_MODE_INPUT,
+			.pull_up_en = GPIO_PULLUP_DISABLE,
+			.pull_down_en = GPIO_PULLDOWN_ENABLE,
+			.intr_type = GPIO_INTR_POSEDGE,
+		};
+		ESP_ERROR_CHECK(gpio_config(&irq_pin_cfg));
 		halGPIO_IRQconfig(lis2hh12IRQ_PIN, lis2hh12IntHandler, NULL);
 	}
 exit:

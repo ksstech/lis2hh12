@@ -215,7 +215,7 @@ int	lis2hh12Config(struct i2c_di_t * psI2C);
 int	lis2hh12Diags(struct i2c_di_t * psI2C);
 
 struct report_t;
-int lis2hh12ReportIG_SRC(report_t * psR);
+int lis2hh12ReportIG_SRC(struct report_t * psR);
 int lis2hh12ReportAll(struct report_t * psR);
 
 #ifdef __cplusplus
