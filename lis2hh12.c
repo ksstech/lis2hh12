@@ -1,5 +1,5 @@
 /*
- * lis2hh12.c - Copyright (c) 2022-23 Andre M. Maree / KSS Technologies (Pty) Ltd.
+ * lis2hh12.c - Copyright (c) 2022-24 Andre M. Maree / KSS Technologies (Pty) Ltd.
  */
 
 #include "hal_config.h"
