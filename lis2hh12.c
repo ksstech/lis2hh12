@@ -4,7 +4,7 @@
 
 #include "hal_config.h"
 
-#if (halHAS_LIS2HH12 > 0)
+#if (HAL_LIS2HH12 > 0)
 #include "endpoints.h"
 #include "hal_i2c_common.h"
 #include "lis2hh12.h"
