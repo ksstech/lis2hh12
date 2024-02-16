@@ -57,7 +57,7 @@ enum {
 
 // ######################################### Structures ############################################
 
-typedef union __attribute__((packed)) {				// CTRL1
+typedef union __attribute__((packed)) {					// CTRL1
 	struct __attribute__((packed)) { u8_t en:3; u8_t bdu:1; u8_t odr:3; u8_t hr:1; };
 	struct __attribute__((packed)) { u8_t xen:1; u8_t yen:1; u8_t zen:1; u8_t oth:5; };
 } lis2hh12_ctrl1_t;
@@ -227,9 +227,9 @@ extern lis2hh12_t sLIS2HH12;
 
 // ###################################### Public functions #########################################
 
-int lis2hh12ReadRegs(u8_t Reg, u8_t * pRxBuf, size_t RxSize);
-int lis2hh12WriteReg(u8_t reg, u8_t val);
-int lis2hh12UpdateReg(u8_t reg, u8_t * pRxBuf, u8_t _and, u8_t _or);
+int lis2hh12ReadRegs(u8_t Reg, u8_t * pU8, size_t RxSize);
+int lis2hh12WriteReg(u8_t Reg, u8_t * pU8, u8_t val);
+int lis2hh12UpdateReg(u8_t Reg, u8_t * pU8, u8_t _and, u8_t _or);
 
 void lis2hh12ReadTrigger(void * Arg);
 int lis2hh12EventHandler(void);
