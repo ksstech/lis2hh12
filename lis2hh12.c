@@ -47,13 +47,14 @@ int lis2hh12ReadRegs(u8_t Reg, u8_t * pU8, size_t RxSize) {
 	return iRV;
 }
 
-int lis2hh12WriteReg(u8_t reg, u8_t val) {
+int lis2hh12WriteReg(u8_t reg, u8_t * pU8, u8_t val) {
 	u8_t u8Buf[2] = { reg, val };
 	xRtosSemaphoreTake(&sLIS2HH12.mux, portMAX_DELAY);
 	IF_SYSTIMER_START(debugTIMING, stLIS2HH12);
 	int iRV = halI2C_Queue(sLIS2HH12.psI2C, i2cW, u8Buf, sizeof(u8Buf), NULL, 0, (i2cq_p1_t) NULL, (i2cq_p2_t) NULL);
 	IF_SYSTIMER_STOP(debugTIMING, stLIS2HH12);
 	xRtosSemaphoreGive(&sLIS2HH12.mux);
+	if (pU8) *pU8 = val;
 	return iRV;
 }
 
@@ -118,8 +119,8 @@ int	lis2hh12Identify(i2c_di_t * psI2C) {
 	psI2C->TObus = 25;
 	psI2C->Test = 1;
 	u8_t U8;
-//	int iRV = lis2hh12WriteReg(lis2hh12CTRL6, 0x80);	// force REBOOT, must wait till cleared...
-	int iRV = lis2hh12WriteReg(lis2hh12CTRL5, 0x40);	// force SOFT RESET, just in case...
+//	int iRV = lis2hh12WriteReg(lis2hh12CTRL6, &sLIS2HH12.Reg.CTRL5, 0x80);	// force REBOOT
+	int iRV = lis2hh12WriteReg(lis2hh12CTRL5, &sLIS2HH12.Reg.CTRL5, 0x40);	// force SOFT RESET
 	if (iRV < erSUCCESS) goto exit;
 
 	iRV = lis2hh12ReadRegs(lis2hh12WHO_AM_I, &U8, sizeof(U8));
