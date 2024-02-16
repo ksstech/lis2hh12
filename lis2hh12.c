@@ -1,12 +1,11 @@
-/*
- * lis2hh12.c - Copyright (c) 2022-24 Andre M. Maree / KSS Technologies (Pty) Ltd.
- */
+// lis2hh12.c - Copyright (c) 2022-24 Andre M. Maree / KSS Technologies (Pty) Ltd.
 
 #include "hal_config.h"
 
 #if (HAL_LIS2HH12 > 0)
 #include "endpoints.h"
 #include "hal_i2c_common.h"
+#include "hal_options.h"
 #include "lis2hh12.h"
 #include "printfx.h"
 #include "rules.h"
@@ -22,15 +21,11 @@
 #define	debugRESULT					(debugFLAG_GLOBAL & debugFLAG & 0x8000)
 
 // ############################################# Macros ############################################
-
-
 // #################################### SI7006/13/20/21 Addresses ##################################
 
 #define	lis2hh12ADDR0				0x1E
 
 // ################################ Forward function declaration ###################################
-
-
 // ######################################### Constants #############################################
 
 const u16_t fs_scale[4] = { 2000, -1, 4000, 8000 };
