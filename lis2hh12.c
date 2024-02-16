@@ -182,6 +182,7 @@ int	lis2hh12Config(i2c_di_t * psI2C) {
 		halGPIO_IRQconfig(lis2hh12IRQ_PIN, lis2hh12IntHandler, NULL);
 	}
 exit:
+	IF_SL_ERROR(iRV < erSUCCESS, iRV);
 	return iRV;
 }
 
