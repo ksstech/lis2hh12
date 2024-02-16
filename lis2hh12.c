@@ -82,7 +82,7 @@ void lis2hh12ReadTrigger(void * Arg) {
 	u8_t Reg = lis2hh12IG_SRC1;
 	xRtosSemaphoreTake(&sLIS2HH12.mux, portMAX_DELAY);
 	halI2C_Queue(sLIS2HH12.psI2C, i2cWRC, &Reg, sizeof(Reg), &sLIS2HH12.Reg.IG_SRC1,
-		SO_MEM(lis2hh12_reg_t, IG_SRC1), (i2cq_p1_t)lis2hh12ReadHandler, (i2cq_p2_t) NULL);
+		SO_MEM(lis2hh12_reg_t, IG_SRC1), (i2cq_p1_t)lis2hh12ReadHandler, (i2cq_p2_t) Arg);
 	xRtosSemaphoreGive(&sLIS2HH12.mux);
 }
 
