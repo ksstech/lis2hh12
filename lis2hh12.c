@@ -76,9 +76,7 @@ int lis2hh12UpdateReg(u8_t reg, u8_t * pU8, u8_t _and, u8_t _or) {
  *	@brief	Check each input, generate event for every input pulsed
  *	@brief	Called in context of the I2C task
  */
-void lis2hh12ReadHandler(void * Arg) {
-	//lis2hh12ReportIG_SRC(NULL);
-}
+void lis2hh12ReadHandler(void * Arg) { lis2hh12ReportIG_SRC(NULL); }
 
 void lis2hh12ReadTrigger(void * Arg) {
 	u8_t Reg = lis2hh12IG_SRC1;
