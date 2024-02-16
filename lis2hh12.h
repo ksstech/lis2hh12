@@ -151,37 +151,61 @@ typedef struct __attribute__((packed)) {				// FIFO_SRC
 } lis2hh12_fifo_src_t;
 DUMB_STATIC_ASSERT(sizeof(lis2hh12_fifo_src_t) == 1);
 
+typedef struct __attribute__((packed)) {				// IG_CFGx
+	u8_t xl:1;
+	u8_t xh:1;
+	u8_t yl:1;
+	u8_t yh:1;
+	u8_t zl:1;
+	u8_t zh:1;
+	u8_t d6:1;
+	u8_t aoi:1;
+} lis2hh12_ig_cfg_t;
+DUMB_STATIC_ASSERT(sizeof(lis2hh12_ig_cfg_t) == 1);
+
+typedef struct __attribute__((packed)) {				// IG_SRCx
+	u8_t xl:1;
+	u8_t xh:1;
+	u8_t yl:1;
+	u8_t yh:1;
+	u8_t zl:1;
+	u8_t zh:1;
+	u8_t ia:1;
+	u8_t spare:1;
+} lis2hh12_ig_src_t;
+DUMB_STATIC_ASSERT(sizeof(lis2hh12_ig_src_t) == 1);
+
 typedef union {						// REGS
 	struct __attribute__((packed)) {
 		union { u8_t TEMPX[2]; u16_t TEMP; };
-		u8_t ACT_THS;
-		u8_t ACT_DUR;
-		union { lis2hh12_ctrl1_t ctrl1; u8_t CTRL1; };				// CTRL1
-		union { lis2hh12_ctrl2_t ctrl2; u8_t CTRL2; };				// CTRL2
-		union { lis2hh12_ctrl3_t ctrl3; u8_t CTRL3; };				// CTRL3
-		union { lis2hh12_ctrl4_t ctrl4; u8_t CTRL4; };				// CTRL4
-		union { lis2hh12_ctrl5_t ctrl5; u8_t CTRL5; };				// CTRL5
-		union { lis2hh12_ctrl6_t ctrl6; u8_t CTRL6; };				// CTRL6
-		union { lis2hh12_ctrl7_t ctrl7; u8_t CTRL7; };				// CTRL7
-		union { lis2hh12_status_t status; u8_t STATUS; };			// STATUS
-		union { u16_t u16OUT_X; u8_t u8OUT_X[2]; };					// OUT_X
-		union { u16_t u16OUT_Y; u8_t u8OUT_Y[2]; };					// OUT_Y
-		union { u16_t u16OUT_Z; u8_t u8OUT_Z[2]; };					// OUT_Z
-		union { lis2hh12_fifo_ctrl_t fifo_ctrl; u8_t FIFO_CTRL; };	// FIFO_CTRL
-		union { lis2hh12_fifo_src_t fifo_src; u8_t FIFO_SRC; };		// FIFO_SRC
-		u8_t IG_CFG1;
-		u8_t IG_SRC1;
-		u8_t IG_THS_X1;
-		u8_t IG_THS_Y1;
-		u8_t IG_THS_Z1;
-		u8_t IG_DUR1;
-		u8_t IG_CFG2;
-		u8_t IG_SRC2;
-		u8_t IG_THS2;
-		u8_t IG_DUR2;
-		union { u16_t u16REF_X; u8_t u8REF_X[2]; };					// REF_X
-		union { u16_t u16REF_Y; u8_t u8REF_Y[2]; };					// REF_Y
-		union { u16_t u16REF_Z; u8_t u8REF_Z[2]; };					// REF_Z
+		u8_t ACT_THS;												// x1E
+		u8_t ACT_DUR;												// x1F
+		union { lis2hh12_ctrl1_t ctrl1; u8_t CTRL1; };				// x20
+		union { lis2hh12_ctrl2_t ctrl2; u8_t CTRL2; };				// x21
+		union { lis2hh12_ctrl3_t ctrl3; u8_t CTRL3; };				// x22
+		union { lis2hh12_ctrl4_t ctrl4; u8_t CTRL4; };				// x23
+		union { lis2hh12_ctrl5_t ctrl5; u8_t CTRL5; };				// x24
+		union { lis2hh12_ctrl6_t ctrl6; u8_t CTRL6; };				// x25
+		union { lis2hh12_ctrl7_t ctrl7; u8_t CTRL7; };				// x26
+		union { lis2hh12_status_t status; u8_t STATUS; };			// x27
+		union { u16_t u16OUT_X; u8_t u8OUT_X[2]; };					// x28/9
+		union { u16_t u16OUT_Y; u8_t u8OUT_Y[2]; };					// x2A/B
+		union { u16_t u16OUT_Z; u8_t u8OUT_Z[2]; };					// x2C/D
+		union { lis2hh12_fifo_ctrl_t fifo_ctrl; u8_t FIFO_CTRL; };	// x2E
+		union { lis2hh12_fifo_src_t fifo_src; u8_t FIFO_SRC; };		// x2F
+		union { lis2hh12_ig_cfg_t ig_cfg1; u8_t IG_CFG1; };			// x30
+		union { lis2hh12_ig_src_t ig_src1; u8_t IG_SRC1; };			// x31
+		u8_t IG_THS_X1;												// x32
+		u8_t IG_THS_Y1;												// x33
+		u8_t IG_THS_Z1;												// x34
+		u8_t IG_DUR1;												// x35
+		union { lis2hh12_ig_cfg_t ig_cfg2; u8_t IG_CFG2; };			// x36
+		union { lis2hh12_ig_cfg_t ig_src2; u8_t IG_SRC2; };			// x37
+		u8_t IG_THS2;												// x38
+		u8_t IG_DUR2;												// x39
+		union { u16_t u16REF_X; u8_t u8REF_X[2]; };					// x3A/B
+		union { u16_t u16REF_Y; u8_t u8REF_Y[2]; };					// x3C/D
+		union { u16_t u16REF_Z; u8_t u8REF_Z[2]; };					// x3E/F
 	};
 	u8_t Regs[36];
 } lis2hh12_reg_t;
