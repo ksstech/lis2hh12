@@ -38,10 +38,10 @@ u32_t lis2hh12IRQsOK, lis2hh12IRQsLost;
 
 // #################################### Local ONLY functions #######################################
 
-int lis2hh12ReadRegs(u8_t Reg, u8_t * pRxBuf, size_t RxSize) {
+int lis2hh12ReadRegs(u8_t Reg, u8_t * pU8, size_t RxSize) {
 	xRtosSemaphoreTake(&sLIS2HH12.mux, portMAX_DELAY);
 	IF_SYSTIMER_START(debugTIMING, stLIS2HH12);
-	int iRV = halI2C_Queue(sLIS2HH12.psI2C, i2cWR_B, &Reg, sizeof(Reg), pRxBuf, RxSize, (i2cq_p1_t) NULL, (i2cq_p2_t) NULL);
+	int iRV = halI2C_Queue(sLIS2HH12.psI2C, i2cWR_B, &Reg, sizeof(Reg), pU8, RxSize, (i2cq_p1_t) NULL, (i2cq_p2_t) NULL);
 	IF_SYSTIMER_STOP(debugTIMING, stLIS2HH12);
 	xRtosSemaphoreGive(&sLIS2HH12.mux);
 	return iRV;
@@ -60,10 +60,10 @@ int lis2hh12WriteReg(u8_t reg, u8_t val) {
 /**
  * @brief	perform a Write-Read-Modify-Write transaction, also updates local register value
  */
-int lis2hh12UpdateReg(u8_t reg, u8_t * pRxBuf, u8_t _and, u8_t _or) {
+int lis2hh12UpdateReg(u8_t reg, u8_t * pU8, u8_t _and, u8_t _or) {
 	xRtosSemaphoreTake(&sLIS2HH12.mux, portMAX_DELAY);
 	IF_SYSTIMER_START(debugTIMING, stLIS2HH12);
-	int iRV = halI2C_Queue(sLIS2HH12.psI2C, i2cWRMW, &reg, sizeof(reg), pRxBuf, 1, (i2cq_p1_t) (u32_t) _and, (i2cq_p2_t) (u32_t) _or);
+	int iRV = halI2C_Queue(sLIS2HH12.psI2C, i2cWRMW, &reg, sizeof(reg), pU8, 1, (i2cq_p1_t) (u32_t) _and, (i2cq_p2_t) (u32_t) _or);
 	IF_SYSTIMER_STOP(debugTIMING, stLIS2HH12);
 	xRtosSemaphoreGive(&sLIS2HH12.mux);
 	return iRV;
