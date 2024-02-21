@@ -3,7 +3,7 @@
 set( srcs "lis2hh12.c" )
 set( include_dirs "." )
 set( priv_include_dirs )
-set( requires )
+set( requires "main" )
 set( priv_requires )
 
 idf_component_register(
