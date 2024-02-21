@@ -234,7 +234,7 @@ typedef struct {
 	SemaphoreHandle_t mux;
 	lis2hh12_reg_t Reg;
 } lis2hh12_t;
-//DUMB_STATIC_ASSERT(sizeof(lis2hh12_t) == 42);
+DUMB_STATIC_ASSERT(sizeof(lis2hh12_t) == 44);
 
 // ###################################### Public variables #########################################
 
