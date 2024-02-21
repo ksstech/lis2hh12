@@ -245,7 +245,6 @@ extern lis2hh12_t sLIS2HH12;
 
 int lis2hh12ReadRegs(u8_t Reg, u8_t * pU8, size_t RxSize);
 int lis2hh12WriteReg(u8_t Reg, u8_t * pU8, u8_t val);
-int lis2hh12UpdateReg(u8_t Reg, u8_t * pU8, u8_t _and, u8_t _or);
 
 f32_t lis2hh12ConvCoord(i32_t Val);
 
