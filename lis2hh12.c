@@ -30,7 +30,8 @@ const u16_t odr_scale[8] = { 0, 10, 50, 100, 200, 400, 800, -1 };
 // ###################################### Local variables ##########################################
 
 lis2hh12_t sLIS2HH12 = { 0 };
-u32_t lis2hh12IRQok, lis2hh12IRQlost, lis2hh12IRQdrdy, lis2hh12IRQfifo, lis2hh12IRQig1, lis2hh12IRQig2;
+u32_t lis2hh12IRQok, lis2hh12IRQlost, lis2hh12IRQfifo, lis2hh12IRQig1, lis2hh12IRQig2;
+u32_t lis2hh12IRQdrdy, lis2hh12IRQdrdyErr;
 
 // #################################### Local ONLY functions #######################################
 
@@ -41,18 +42,17 @@ int lis2hh12WriteReg(u8_t reg, u8_t * pU8, u8_t val) {
 	return iRV;
 }
 
-int lis2hh12ReadRegs(u8_t Reg, u8_t * pU8, size_t RxSize) {
-//	IF_myASSERT(debugTRACK, INRANGE(lis2hh12TEMP_L, Reg, lis2hh12ZH_REF) && RxSize);
-	int iRV = halI2C_Queue(sLIS2HH12.psI2C, i2cWR_B, &Reg, sizeof(Reg), pU8, RxSize, (i2cq_p1_t) NULL, (i2cq_p2_t) NULL);
-	return iRV;
+int lis2hh12ReadRegs(u8_t reg, u8_t * pU8, size_t size) {
+	IF_myASSERT(debugTRACK, INRANGE(lis2hh12TEMP_L, reg, lis2hh12ZH_REF) && size);
+	return halI2C_Queue(sLIS2HH12.psI2C, i2cWR_B, &reg, sizeof(reg), pU8, size, (i2cq_p1_t) NULL, (i2cq_p2_t) NULL);
 }
 
 /**
  * @brief	perform a Write-Read-Modify-Write transaction, also updates local register value
  */
 int lis2hh12UpdateReg(u8_t reg, u8_t * pU8, u8_t _and, u8_t _or) {
-	int iRV = halI2C_Queue(sLIS2HH12.psI2C, i2cWRMW, &reg, sizeof(reg), pU8, 1, (i2cq_p1_t) (u32_t) _and, (i2cq_p2_t) (u32_t) _or);
-	return iRV;
+	IF_myASSERT(debugTRACK, INRANGE(lis2hh12TEMP_L, reg, lis2hh12ZH_REF) && pU8 && halCONFIG_inSRAM(pU8));
+	return halI2C_Queue(sLIS2HH12.psI2C, i2cWRMW, &reg, sizeof(reg), pU8, 1, (i2cq_p1_t) (u32_t) _and, (i2cq_p2_t) (u32_t) _or);
 }
 
 f32_t lis2hh12ConvCoord(i32_t Val) {
@@ -120,23 +120,23 @@ exit:
 /**
  *	@brief	DRDY IRQ handling
  */
-void lis2hh12DRDY_0(void * Arg) {
+void lis2hh12IntDRDY(void * Arg) {
 	if (sLIS2HH12.Reg. status.ZYXda) {							// Data Available?
 		lis2hh12ReadRegs(lis2hh12OUT_X_L, &sLIS2HH12.Reg.u8OUT_X[0], lis2hh12OUT_Z_H-lis2hh12OUT_X_L+1);
 		++lis2hh12IRQdrdy;
 	} else
-		SL_ERR("DRDY IRQ but ZYXda not set !!!!");
+		++lis2hh12IRQdrdyErr;
 }
 
 /**
  *	@brief	FIFO IRQ handling
  */
-void lis2hh12FIFO_SRC_0(void * Arg) {
-	RPTL(); u8_t count = sLIS2HH12.Reg.fifo_src.fss + sLIS2HH12.Reg.fifo_src.ovr;
-	myASSERT(INRANGE(1, count, 32) && sLIS2HH12.Reg.fifo_src.fth)
+void lis2hh12IntFIFO(void * Arg) {
+	u8_t count = sLIS2HH12.Reg.fifo_src.fss + sLIS2HH12.Reg.fifo_src.ovr;
+	myASSERT(INRANGE(1, count, 32) && sLIS2HH12.Reg.fifo_src.fth);
 	while (count) {
-		if (lis2hh12ReadRegs(lis2hh12OUT_X_L, &sLIS2HH12.Reg.u8OUT_X[0], lis2hh12OUT_Z_H-lis2hh12OUT_X_L+1) > erFAILURE)
-			printfx("#%d: x=%hd  Y=%hd  Z=%hd\r\n", count, sLIS2HH12.Reg.i16OUT_X, sLIS2HH12.Reg.i16OUT_Y, sLIS2HH12.Reg.i16OUT_Z);
+		lis2hh12ReadRegs(lis2hh12OUT_X_L, &sLIS2HH12.Reg.u8OUT_X[0], lis2hh12OUT_Z_H-lis2hh12OUT_X_L+1);
+		RP("#%d: x=%hd  Y=%hd  Z=%hd\r\n", count, sLIS2HH12.Reg.i16OUT_X, sLIS2HH12.Reg.i16OUT_Y, sLIS2HH12.Reg.i16OUT_Z);
 		--count;
 	}
 	++lis2hh12IRQfifo;
@@ -145,40 +145,47 @@ void lis2hh12FIFO_SRC_0(void * Arg) {
 /**
  *	@brief	IG1 IRQ handling
  */
-void lis2hh12IG_SRC1_0(void * Arg) { RPTL();++lis2hh12IRQig1; }
+void lis2hh12IntIG1(void * Arg) { ++lis2hh12IRQig1; }
 
 /**
  *	@brief	IG2 IRQ handling
  */
-void lis2hh12IG_SRC2_0(void * Arg) { RPTL();++lis2hh12IRQig2; }
+void lis2hh12IntIG2(void * Arg) { ++lis2hh12IRQig2; }
 
 /**
  * IRQ context
  */
 void IRAM_ATTR lis2hh12IntHandler(void * Arg) {
-	if (sLIS2HH12.Reg.FIFO_CTRL)
-		RPT(" C3=0x%02X  FIFO Mode=%d Thr=%d\r\n", sLIS2HH12.Reg.CTRL3, sLIS2HH12.Reg.fifo_ctrl.fmode, sLIS2HH12.Reg.fifo_ctrl.fth);
+	int count = 0;
 	u8_t Reg;
 	if (sLIS2HH12.Reg.ctrl3.int1_drdy) {					// DRDY on INT1 enabled?
 		Reg = lis2hh12STATUS;
 		halI2C_Queue(sLIS2HH12.psI2C, i2cWRC, &Reg, sizeof(Reg), &sLIS2HH12.Reg.STATUS,
-			SO_MEM(lis2hh12_reg_t, STATUS), (i2cq_p1_t)lis2hh12DRDY_0, (i2cq_p2_t) Arg);
+			SO_MEM(lis2hh12_reg_t, STATUS), (i2cq_p1_t)lis2hh12IntDRDY, (i2cq_p2_t) Arg);
+		++count;
 	}
 	if ((sLIS2HH12.Reg.CTRL3 & 0xC6) && sLIS2HH12.Reg.fifo_ctrl.fmode) {	// FIFO interrupts on INT1 enabled
 		Reg = lis2hh12FIFO_SRC;
 		halI2C_Queue(sLIS2HH12.psI2C, i2cWRC, &Reg, sizeof(Reg), &sLIS2HH12.Reg.FIFO_SRC,
-			SO_MEM(lis2hh12_reg_t, FIFO_SRC), (i2cq_p1_t)lis2hh12FIFO_SRC_0, (i2cq_p2_t) Arg);
+			SO_MEM(lis2hh12_reg_t, FIFO_SRC), (i2cq_p1_t)lis2hh12IntFIFO, (i2cq_p2_t) Arg);
+		++count;
 	}
 	if (sLIS2HH12.Reg.ctrl3.int1_ig1) {
 		Reg = lis2hh12IG_SRC1;
 		halI2C_Queue(sLIS2HH12.psI2C, i2cWRC, &Reg, sizeof(Reg), &sLIS2HH12.Reg.IG_SRC1,
-			SO_MEM(lis2hh12_reg_t, IG_SRC1), (i2cq_p1_t)lis2hh12IG_SRC1_0, (i2cq_p2_t) Arg);
+			SO_MEM(lis2hh12_reg_t, IG_SRC1), (i2cq_p1_t)lis2hh12IntIG1, (i2cq_p2_t) Arg);
+		++count;
 	}
 	if (sLIS2HH12.Reg.ctrl3.int1_ig2) {
 		Reg = lis2hh12IG_SRC2;
 		halI2C_Queue(sLIS2HH12.psI2C, i2cWRC, &Reg, sizeof(Reg), &sLIS2HH12.Reg.IG_SRC2,
-			SO_MEM(lis2hh12_reg_t, IG_SRC2), (i2cq_p1_t)lis2hh12IG_SRC2_0, (i2cq_p2_t) Arg);
+			SO_MEM(lis2hh12_reg_t, IG_SRC2), (i2cq_p1_t)lis2hh12IntIG2, (i2cq_p2_t) Arg);
+		++count;
 	}
+	if (count)
+		lis2hh12IRQok += count;
+	else
+		++lis2hh12IRQlost;
 }
 
 // ################### Identification, Diagnostics & Configuration functions #######################
@@ -217,21 +224,26 @@ int	lis2hh12Config(i2c_di_t * psI2C) {
 	psI2C->CFGok = 0;
 
 	int iRV;
-//	iRV = lis2hh12WriteReg(lis2hh12CTRL1, &sLIS2HH12.Reg.CTRL1, 0x3F);		// hr=0 odr=100 bdu=1 en=7
 	iRV = lis2hh12WriteReg(lis2hh12CTRL1, &sLIS2HH12.Reg.CTRL1, 0x1F);		// hr=0 odr=10 bdu=1 en=7
 	if (iRV < erSUCCESS) goto exit;
+
 	iRV = lis2hh12WriteReg(lis2hh12CTRL2, &sLIS2HH12.Reg.CTRL2, 0x00);		// HPF default
 	if (iRV < erSUCCESS) goto exit;
-//	iRV = lis2hh12WriteReg(lis2hh12CTRL3, &sLIS2HH12.Reg.CTRL3, 0x00);		// INT1 default
-	iRV = lis2hh12WriteReg(lis2hh12CTRL3, &sLIS2HH12.Reg.CTRL3, 0x01);		// INT1 DRDY
+
+	iRV = lis2hh12WriteReg(lis2hh12CTRL3, &sLIS2HH12.Reg.CTRL3, 0x00);		// INT1 default
+//	iRV = lis2hh12WriteReg(lis2hh12CTRL3, &sLIS2HH12.Reg.CTRL3, 0x01);		// INT1 DRDY
 	if (iRV < erSUCCESS) goto exit;
+
 	iRV = lis2hh12WriteReg(lis2hh12CTRL4, &sLIS2HH12.Reg.CTRL4, 0x04);		// IF_ADD_INCR default
 	if (iRV < erSUCCESS) goto exit;
+
 	iRV = lis2hh12WriteReg(lis2hh12CTRL5, &sLIS2HH12.Reg.CTRL5, 0x03);		// Open drain & active low
 	if (iRV < erSUCCESS) goto exit;
+
 	iRV = lis2hh12WriteReg(lis2hh12FIFO_CTRL, &sLIS2HH12.Reg.FIFO_CTRL, 0x00);	// default
 	if (iRV < erSUCCESS) goto exit;
-	ESP_ERROR_CHECK(esp_cpu_set_watchpoint(0, &sLIS2HH12.Reg.FIFO_CTRL, 1, ESP_CPU_WATCHPOINT_STORE));
+//	ESP_ERROR_CHECK(esp_cpu_set_watchpoint(0, &sLIS2HH12.Reg.FIFO_CTRL, 1, ESP_CPU_WATCHPOINT_STORE));
+
 	iRV = lis2hh12WriteReg(lis2hh12IG_CFG1, &sLIS2HH12.Reg.IG_CFG1, 0x00);	// default
 	if (iRV < erSUCCESS) goto exit;
 
@@ -248,7 +260,6 @@ int	lis2hh12Config(i2c_di_t * psI2C) {
 		ESP_ERROR_CHECK(gpio_config(&irq_pin_cfg));
 		halGPIO_IRQconfig(lis2hh12IRQ_PIN, lis2hh12IntHandler, NULL);
 	}
-//	lis2hh12ReportAll(NULL);
 exit:
 	IF_SL_ERROR(iRV < erSUCCESS, iRV);
 	return iRV;
@@ -351,8 +362,8 @@ int lis2hh12ReportAll(report_t * psR) {
 	iRV += lis2hh12ReportIG2(psR);
 	iRV +=  wprintfx(psR, "\tREF_X=%d  REF_Y=%d  REF_Z=%d\r\n",
 		sLIS2HH12.Reg.u16REF_X, sLIS2HH12.Reg.u16REF_Y, sLIS2HH12.Reg.u16REF_Z);
-	iRV += wprintfx(psR, "\tIRQs OK=%lu  Lost=%lu  DRDY=%lu  FIFO=%lu  IG1=%lu  IG2=%lu\r\n",
-		lis2hh12IRQok, lis2hh12IRQlost, lis2hh12IRQdrdy, lis2hh12IRQfifo, lis2hh12IRQig1, lis2hh12IRQig2);
+	iRV += wprintfx(psR, "\tIRQs OK=%lu  Lost=%lu  DRDY=%lu  DRDYerr=%lu  FIFO=%lu  IG1=%lu  IG2=%lu\r\n",
+		lis2hh12IRQok, lis2hh12IRQlost, lis2hh12IRQdrdy, lis2hh12IRQdrdyErr, lis2hh12IRQfifo, lis2hh12IRQig1, lis2hh12IRQig2);
 	return iRV;
 }
 #endif
