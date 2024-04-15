@@ -13,14 +13,13 @@
 #include "systiming.h"
 #include "x_errors_events.h"
 
-#define	debugFLAG					0xF000
+// ############################################# Macros ############################################
 
+#define	debugFLAG					0xF000
 #define	debugTIMING					(debugFLAG_GLOBAL & debugFLAG & 0x1000)
 #define	debugTRACK					(debugFLAG_GLOBAL & debugFLAG & 0x2000)
 #define	debugPARAM					(debugFLAG_GLOBAL & debugFLAG & 0x4000)
 #define	debugRESULT					(debugFLAG_GLOBAL & debugFLAG & 0x8000)
-
-// ############################################# Macros ############################################
 
 // ######################################### Constants #############################################
 
@@ -242,7 +241,6 @@ int	lis2hh12Config(i2c_di_t * psI2C) {
 
 	iRV = lis2hh12WriteReg(lis2hh12FIFO_CTRL, &sLIS2HH12.Reg.FIFO_CTRL, 0x00);	// default
 	if (iRV < erSUCCESS) goto exit;
-//	ESP_ERROR_CHECK(esp_cpu_set_watchpoint(0, &sLIS2HH12.Reg.FIFO_CTRL, 1, ESP_CPU_WATCHPOINT_STORE));
 
 	iRV = lis2hh12WriteReg(lis2hh12IG_CFG1, &sLIS2HH12.Reg.IG_CFG1, 0x00);	// default
 	if (iRV < erSUCCESS) goto exit;
