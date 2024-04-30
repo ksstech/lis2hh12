@@ -155,36 +155,40 @@ void lis2hh12IntIG2(void * Arg) { ++lis2hh12IRQig2; }
  * IRQ context
  */
 void IRAM_ATTR lis2hh12IntHandler(void * Arg) {
-	int count = 0;
+	int iRV1 = 0, iRV2 = 0, iRV3 = 0, iRV4 = 0, count = 0;
 	u8_t Reg;
 	if (sLIS2HH12.Reg.ctrl3.int1_drdy) {					// DRDY on INT1 enabled?
 		Reg = lis2hh12STATUS;
-		halI2C_Queue(sLIS2HH12.psI2C, i2cWRC, &Reg, sizeof(Reg), &sLIS2HH12.Reg.STATUS,
+		iRV1 = halI2C_Queue(sLIS2HH12.psI2C, i2cWRC, &Reg, sizeof(Reg), &sLIS2HH12.Reg.STATUS,
 			SO_MEM(lis2hh12_reg_t, STATUS), (i2cq_p1_t)lis2hh12IntDRDY, (i2cq_p2_t) Arg);
 		++count;
 	}
 	if ((sLIS2HH12.Reg.CTRL3 & 0xC6) && sLIS2HH12.Reg.fifo_ctrl.fmode) {	// FIFO interrupts on INT1 enabled
 		Reg = lis2hh12FIFO_SRC;
-		halI2C_Queue(sLIS2HH12.psI2C, i2cWRC, &Reg, sizeof(Reg), &sLIS2HH12.Reg.FIFO_SRC,
+		iRV2 = halI2C_Queue(sLIS2HH12.psI2C, i2cWRC, &Reg, sizeof(Reg), &sLIS2HH12.Reg.FIFO_SRC,
 			SO_MEM(lis2hh12_reg_t, FIFO_SRC), (i2cq_p1_t)lis2hh12IntFIFO, (i2cq_p2_t) Arg);
 		++count;
 	}
 	if (sLIS2HH12.Reg.ctrl3.int1_ig1) {
 		Reg = lis2hh12IG_SRC1;
-		halI2C_Queue(sLIS2HH12.psI2C, i2cWRC, &Reg, sizeof(Reg), &sLIS2HH12.Reg.IG_SRC1,
+		iRV3 = halI2C_Queue(sLIS2HH12.psI2C, i2cWRC, &Reg, sizeof(Reg), &sLIS2HH12.Reg.IG_SRC1,
 			SO_MEM(lis2hh12_reg_t, IG_SRC1), (i2cq_p1_t)lis2hh12IntIG1, (i2cq_p2_t) Arg);
 		++count;
 	}
 	if (sLIS2HH12.Reg.ctrl3.int1_ig2) {
 		Reg = lis2hh12IG_SRC2;
-		halI2C_Queue(sLIS2HH12.psI2C, i2cWRC, &Reg, sizeof(Reg), &sLIS2HH12.Reg.IG_SRC2,
+		iRV4 = halI2C_Queue(sLIS2HH12.psI2C, i2cWRC, &Reg, sizeof(Reg), &sLIS2HH12.Reg.IG_SRC2,
 			SO_MEM(lis2hh12_reg_t, IG_SRC2), (i2cq_p1_t)lis2hh12IntIG2, (i2cq_p2_t) Arg);
 		++count;
 	}
-	if (count)
+	if (count) {
 		lis2hh12IRQok += count;
-	else
+	} else {
 		++lis2hh12IRQlost;
+	}
+	if (iRV1 == pdTRUE || iRV2 == pdTRUE || iRV3 == pdTRUE || iRV4 == pdTRUE) {
+		portYIELD_FROM_ISR(); 
+	}
 }
 
 // ################### Identification, Diagnostics & Configuration functions #######################
