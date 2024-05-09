@@ -63,11 +63,11 @@ f32_t lis2hh12ConvCoord(i32_t Val) {
 int lis2hh12SetInactivity(u8_t ths, u8_t dur) {
 	int iRV ;
 	iRV = lis2hh12WriteReg(lis2hh12ACT_THS, &sLIS2HH12.Reg.ACT_THS, ths);	// #of FSD/128 mG
-	if (iRV < erSUCCESS) goto exit;
-
+	if (iRV < erSUCCESS)
+		goto exit;
 	iRV = lis2hh12WriteReg(lis2hh12ACT_DUR, &sLIS2HH12.Reg.ACT_DUR, dur);	// # of (8/ODR) sec
-	if (iRV < erSUCCESS) goto exit;
-
+	if (iRV < erSUCCESS)
+		goto exit;
 	u8_t stat = (ths > 0 || dur > 0) ? 0x20 : 0x00;		// INT1_INACT en/disable?
 	iRV = lis2hh12UpdateReg(lis2hh12CTRL3, &sLIS2HH12.Reg.CTRL3, 0xDF, stat);
 exit:
@@ -100,18 +100,17 @@ int lis2hh12SetBW(e_bw_t bw) {
 
 int lis2hh12ConfigFIFO(e_fm_t mode, u8_t thres) {
 	int iRV = lis2hh12WriteReg(lis2hh12FIFO_CTRL, &sLIS2HH12.Reg.FIFO_CTRL, (mode << 5) | (thres & 0x1F));
-	if (iRV < erSUCCESS) goto exit;
-
+	if (iRV < erSUCCESS)
+		return iRV;
 	u8_t mask, flag;
 	if (mode > fmBYPASS && thres > 0) {
-		mask = 0x7F; flag = 0x80;
+		mask = 0x7F;
+		flag = 0x80;
 	} else {
-		mask = 0x7F; flag = 0x80;
+		mask = 0x7F;
+		flag = 0x80;
 	}
-	iRV = lis2hh12UpdateReg(lis2hh12CTRL3, &sLIS2HH12.Reg.CTRL3, mask, flag);
-	if (iRV < erSUCCESS) goto exit;
-exit:
-	return iRV;
+	return lis2hh12UpdateReg(lis2hh12CTRL3, &sLIS2HH12.Reg.CTRL3, mask, flag);
 }
 
 // #################################### Interrupt support ##########################################
@@ -123,8 +122,9 @@ void lis2hh12IntDRDY(void * Arg) {
 	if (sLIS2HH12.Reg. status.ZYXda) {							// Data Available?
 		lis2hh12ReadRegs(lis2hh12OUT_X_L, &sLIS2HH12.Reg.u8OUT_X[0], lis2hh12OUT_Z_H-lis2hh12OUT_X_L+1);
 		++lis2hh12IRQdrdy;
-	} else
+	} else {
 		++lis2hh12IRQdrdyErr;
+	}
 }
 
 /**
@@ -212,13 +212,15 @@ int	lis2hh12Identify(i2c_di_t * psI2C) {
 	int iRV = lis2hh12WriteReg(lis2hh12CTRL6, NULL, 0x80);	// REBOOT
 	vTaskDelay(30);
 //	int iRV = lis2hh12WriteReg(lis2hh12CTRL5, NULL, 0x40);	// SOFT RESET
-	if (iRV < erSUCCESS) goto exit;
+	if (iRV < erSUCCESS)
+		return iRV;
 	iRV = lis2hh12ReadRegs(lis2hh12WHO_AM_I, &U8, sizeof(U8));
-	if (iRV < erSUCCESS) goto exit;
-	if (U8 != lis2hh12WHOAMI_NUM) return erINV_WHOAMI;
+	if (iRV < erSUCCESS)
+		return iRV;
+	if (U8 != lis2hh12WHOAMI_NUM)
+		return erINV_WHOAMI;
 	psI2C->IDok = 1;
 	psI2C->Test = 0;
-exit:
 	return iRV;
 }
 
