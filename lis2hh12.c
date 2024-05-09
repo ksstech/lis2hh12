@@ -135,7 +135,7 @@ void lis2hh12IntFIFO(void * Arg) {
 	myASSERT(INRANGE(1, count, 32) && sLIS2HH12.Reg.fifo_src.fth);
 	while (count) {
 		lis2hh12ReadRegs(lis2hh12OUT_X_L, &sLIS2HH12.Reg.u8OUT_X[0], lis2hh12OUT_Z_H-lis2hh12OUT_X_L+1);
-		RP("#%d: x=%hd  Y=%hd  Z=%hd\r\n", count, sLIS2HH12.Reg.i16OUT_X, sLIS2HH12.Reg.i16OUT_Y, sLIS2HH12.Reg.i16OUT_Z);
+		PX("#%d: x=%hd  Y=%hd  Z=%hd\r\n", count, sLIS2HH12.Reg.i16OUT_X, sLIS2HH12.Reg.i16OUT_Y, sLIS2HH12.Reg.i16OUT_Z);
 		--count;
 	}
 	++lis2hh12IRQfifo;
@@ -195,7 +195,7 @@ void IRAM_ATTR lis2hh12IntHandler(void * Arg) {
 
 void test(int i) {
 	lis2hh12ReadRegs(lis2hh12FIFO_CTRL, &sLIS2HH12.Reg.FIFO_CTRL, 1);
-	RP("i=%d\tFIFO_CTRL=x%02X\r\n", i, sLIS2HH12.Reg.FIFO_CTRL);
+	PX("i=%d\tFIFO_CTRL=x%02X\r\n", i, sLIS2HH12.Reg.FIFO_CTRL);
 }
 
 /**
