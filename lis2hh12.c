@@ -51,7 +51,7 @@ int lis2hh12ReadRegs(u8_t reg, u8_t * pU8, size_t size) {
  * @brief	perform a Write-Read-Modify-Write transaction, also updates local register value
  */
 int lis2hh12UpdateReg(u8_t reg, u8_t * pU8, u8_t _and, u8_t _or) {
-	IF_myASSERT(debugTRACK, INRANGE(lis2hh12TEMP_L, reg, lis2hh12ZH_REF) && pU8 && halCONFIG_inSRAM(pU8));
+	IF_myASSERT(debugTRACK, INRANGE(lis2hh12TEMP_L, reg, lis2hh12ZH_REF) && pU8 && halMemorySRAM(pU8));
 	return halI2C_Queue(sLIS2HH12.psI2C, i2cWRMW, &reg, sizeof(reg), pU8, 1, (i2cq_p1_t) (u32_t) _and, (i2cq_p2_t) (u32_t) _or);
 }
 
