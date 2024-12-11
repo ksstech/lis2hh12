@@ -11,6 +11,36 @@ extern "C" {
 #define lis2hh12ADDR				0x1E				// 0x1C -> 0x1F selectable
 #define lis2hh12WHOAMI_NUM			0x41
 
+#define	makeCTRL1(HR,ODR,BDU,Zen,Yen,Xen)										\
+	(((HR&1)<<7) | ((ODR&7)<<4) | ((BDU&1)<<3) | ((Zen&1)<<2) |	((Yen&1)<<1) | (Xen&1))
+
+#define	makeCTRL2(DFC,HPM,FDS,HPIS1,HPIS2)										\
+	(((DFC&3)<<5) | ((HPM&3)<<3) | ((FDS&1)<<2) | ((HPIS1&1)<<1) | (HPIS2&1))
+
+#define	makeCTRL3(Fen,I1STOP,I1INACT,I1IG2,I1IG1,I1OVR,I1FTH,I1DRDY)			\
+	(((Fen&1)<<7) | ((I1STOP&1)<<6) | ((I1INACT&1)<<5) | ((I1IG2&1)<<4) | ((I1IG1&1)<<3) | ((I1OVR&1)<<2) | ((I1FTH&1)<<1) | (I1DRDY&1))
+
+#define	makeCTRL4(BW,FS,BWman,INCR,I2Cdis,SIM)									\
+	(((BW&3)<<6) | ((FS&3)<<4) | ((BWman&1)<<3) | ((INCR&1)<<2) | ((I2Cdis&1)<<1) | (SIM&1))
+
+#define	makeCTRL5(DBG,RST,DEC,TST,HLact,ODen)									\
+	(((DBG&1)<<7) | ((RST&1)<<6) | ((DEC&3)<<4) | ((TST&3)<<2) | ((HLact&1)<<1) | (ODen&1))
+
+#define	makeCTRL6(BOOT,I2BOOT,I2IG2,I2IG1,I2EMPTY,I2FTH,I2DRDY)					\
+	(((BOOT&1)<<7) | ((I2BOOT&1)<<5) | ((I2IG2&1)<<4) | ((I2IG1&1)<<3) | ((I2EMPTY&1)<<2) | ((I2FTH&1)<<1) | (I2DRDY&1))
+
+#define	makeCTRL7(I2DCRM,I1DCRM,I2LIR,I1LIR,I2_4D,I1_4D)						\
+	(((I2DCRM&1)<<5) | ((I1DCRM&1)<<4) | ((I2LIR&1)<<3) | ((I1LIR&1)<<2) | ((I2_4D&1)<<1) | ((I1_4D&1)))
+
+#define	makeFIFOC(FMode,FTH)													\
+	(((FMode&7)<<4) | (FTH&31))
+
+#define	makeIGxCFG(AOI,D6,ZH,ZL,YH,YL,XH,XL)									\
+	(((AOI&1)<<7) | ((D6&1)<<6) | ((ZH&1)<<5) | ((ZL&1)<<4) | ((YH&1)<<3) | ((YL&1)<<2) | ((XH&1)<<1) | (XL&1))
+
+#define	makeIGxDUR(WAITx,DURx)													\
+	(((WAITx&1)<<7) | (DURx&0x7F))
+
 // ######################################## Enumerations ###########################################
 
 enum {
@@ -53,15 +83,51 @@ enum {
 	lis2hh12ZH_REF,
 };
 
-typedef enum { odr0, odr10, odr50, odr100, odr200, odr400, odr800 } e_odr_t;
+typedef enum {
+	lis2hh12_axisNONE, 
+	lis2hh12_axisX, 
+	lis2hh12_axisY, 
+	lis2hh12_axisYX, 
+	lis2hh12_axisZ,
+	lis2hh12_axisZX, 
+	lis2hh12_axisZY,
+	lis2hh12_axisZYX,
+} lis2hh12_axis_t;
 
-typedef enum { axisNONE, axisX, axisY, axisXY, axisZ, axisXZ, axisYZ, axisXYZ } e_axis_t;
+typedef enum { lis2hh12_odr0, lis2hh12_odr10, lis2hh12_odr50, lis2hh12_odr100, lis2hh12_odr200, lis2hh12_odr400, lis2hh12_odr800 } lis2hh12_odr_t;
 
-typedef enum { fs2G, fs4G = 2, fs8G } e_fs_t;
+typedef enum { lis2hh12_fs2G, lis2hh12_fs4G = 2, lis2hh12_fs8G } lis2hh12_fs_t;
+
+typedef enum { lis2hh12_deci0, lis2hh12_deci2, lis2hh12_deci4, lis2hh12_deci8 } lis2hh12_deci_t;
 
 typedef enum { bw400, bw200, bw100, bm50 } e_bw_t;
 
 typedef enum { fmBYPASS, fmFIFO, fmSTREAM, fmS2F, fmB2S, fmB2F = 7 } e_fm_t;
+
+typedef enum { lis2hh12_intpathNONE, lis2hh12_intpathIG1, lis2hh12_intpathIG2, lis2hh12_intpathBOTH } lis2hh12_intpath_t;
+
+typedef enum { lis2hh12_outpathBYPASS, lis2hh12_outpathLOPASS, lis2hh12_outpathHIPASS } lis2hh12_outpath_t;
+
+typedef enum {
+	lis2hh12_hp_odr_div50			= 0x00,
+	lis2hh12_hp_odr_div100			= 0x20,
+	lis2hh12_hp_odr_div9			= 0x40,
+	lis2hh12_hp_odr_div400			= 0x60,
+	lis2hh12_hp_odr_div50_REF_MD	= 0x01,
+	lis2hh12_hp_odr_div100_REF_MD	= 0x21,
+	lis2hh12_hp_odr_div9_REF_MD		= 0x41,
+	lis2hh12_hp_odr_div400_REF_MD	= 0x61,
+} lis2hh12_hp_bw_t;
+
+typedef enum { lis2hh12_lp_odr_div50, lis2hh12_lp_odr_div100, lis2hh12_lp_odr_div9, lis2hh12_lp_odr_div400 } lis2hh12_lp_bw_t;
+
+typedef enum {
+  lis2hh12_aa_bwAUTO      = 0x00,
+  lis2hh12_aa_bw408Hz     = 0x08,
+  lis2hh12_aa_bw211Hz     = 0x48,
+  lis2hh12_aa_bw105Hz     = 0x88,
+  lis2hh12_aa_bw50Hz      = 0xC8,
+} lis2hh12_aa_bw_t;
 
 // ######################################### Structures ############################################
 
@@ -95,7 +161,7 @@ DUMB_STATIC_ASSERT(sizeof(lis2hh12_ctrl3_t) == 1);
 
 typedef struct __attribute__((packed)) {				// CTRL4 ~ general config
 	u8_t sim:1;						// 0=3, 1=4 wire SPI
-	u8_t i2c_enable:1;				// 0=enable, 1=disable I2C
+	u8_t i2c_disable:1;				// 0=enable, 1=disable I2C
 	u8_t if_add_inc:1;				// 1=enable
 	u8_t bw_scale_odr:1;			// 0=BW auto, 1=use bw[6:7]
 	u8_t fs:2;
@@ -192,7 +258,7 @@ typedef struct __attribute__((packed)) {				// IG_DURx
 } lis2hh12_ig_dur_t;
 DUMB_STATIC_ASSERT(sizeof(lis2hh12_ig_dur_t) == 1);
 
-typedef union __attribute__((packed)) {					// REGS
+typedef union __attribute__((packed)) lis2hh12_reg_t {	// REGS
 	struct __attribute__((packed)) {
 		union { i16_t i16TEMP; u8_t TEMPX[2]; };					// x0B/C
 		u8_t ACT_THS;												// x1E
@@ -205,9 +271,14 @@ typedef union __attribute__((packed)) {					// REGS
 		union { lis2hh12_ctrl6_t ctrl6; u8_t CTRL6; };				// x25
 		union { lis2hh12_ctrl7_t ctrl7; u8_t CTRL7; };				// x26
 		union { lis2hh12_status_t status; u8_t STATUS; };			// x27
-		union { i16_t i16OUT_X; u8_t u8OUT_X[2]; };					// x28/9
-		union { i16_t i16OUT_Y; u8_t u8OUT_Y[2]; };					// x2A/B
-		union { i16_t i16OUT_Z; u8_t u8OUT_Z[2]; };					// x2C/D
+		union {														// x28-2D
+			i16_t i16OUT[3];
+			struct {
+				union { i16_t i16OUT_X; u8_t u8OUT_X[2]; };			// x28/9
+				union { i16_t i16OUT_Y; u8_t u8OUT_Y[2]; };			// x2A/B
+				union { i16_t i16OUT_Z; u8_t u8OUT_Z[2]; };			// x2C/D
+			};
+		};
 		union { lis2hh12_fifo_ctrl_t fifo_ctrl; u8_t FIFO_CTRL; };	// x2E
 		union { lis2hh12_fifo_src_t fifo_src; u8_t FIFO_SRC; };		// x2F
 		union { lis2hh12_ig_cfg_t ig_cfg1; u8_t IG_CFG1; };			// x30
