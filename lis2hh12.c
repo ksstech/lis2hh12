@@ -8,7 +8,7 @@
 #include "hal_memory.h"
 #include "hal_options.h"
 #include "lis2hh12.h"
-#include "printfx.h"
+#include "report.h"
 #include "rules.h"
 #include "syslog.h"
 #include "systiming.h"
