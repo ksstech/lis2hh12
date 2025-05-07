@@ -140,79 +140,79 @@ int lis2hh12ConfigFIFO(e_fm_t mode, u8_t thres) {
 // #################################### Reporting support ##########################################
 
 int lis2hh12ReportTEMP(report_t * psR) {
-	return wprintfx(psR, "\tTEMP: (x%04X) Val=%d" strNL, sLIS2HH12.Reg.i16TEMP, sLIS2HH12.Reg.i16TEMP);
+	return xReport(psR, "\tTEMP: (x%04X) Val=%d" strNL, sLIS2HH12.Reg.i16TEMP, sLIS2HH12.Reg.i16TEMP);
 }
 
 int lis2hh12ReportActDur(report_t * psR) {
 	i32_t Val = sLIS2HH12.Reg.ctrl1.odr ? (sLIS2HH12.Reg.ACT_DUR * 8) / odr_scale[sLIS2HH12.Reg.ctrl1.odr] : 0;
-	return wprintfx(psR, "\tACT_DUR: (x%02X) %ds " strNL, sLIS2HH12.Reg.ACT_DUR, Val);
+	return xReport(psR, "\tACT_DUR: (x%02X) %ds " strNL, sLIS2HH12.Reg.ACT_DUR, Val);
 }
 
 int lis2hh12ReportActThr(report_t * psR) {
 	i32_t Val = (sLIS2HH12.Reg.ACT_THS * fs_scale[sLIS2HH12.Reg.ctrl4.fs]) / 128;
-	return wprintfx(psR, "\tACT_THS: (x%02X) %dmg " strNL, sLIS2HH12.Reg.ACT_THS, Val);
+	return xReport(psR, "\tACT_THS: (x%02X) %dmg " strNL, sLIS2HH12.Reg.ACT_THS, Val);
 }
 
 int li2hh12ReportCTRL1(report_t * psR) {
-	return wprintfx(psR, "\tCTRL1: (x%02X)  hr=%d  odr=%d/%dHz  bdu=%d  Zen=%d  Yen=%d  Xen=%d" strNL,
+	return xReport(psR, "\tCTRL1: (x%02X)  hr=%d  odr=%d/%dHz  bdu=%d  Zen=%d  Yen=%d  Xen=%d" strNL,
 		sLIS2HH12.Reg.CTRL1, sLIS2HH12.Reg.ctrl1.hr, sLIS2HH12.Reg.ctrl1.odr, odr_scale[sLIS2HH12.Reg.ctrl1.odr],
 		sLIS2HH12.Reg.ctrl1.bdu, sLIS2HH12.Reg.ctrl1.zen, sLIS2HH12.Reg.ctrl1.yen, sLIS2HH12.Reg.ctrl1.xen);
 }
 
 int li2hh12ReportCTRL2(report_t * psR) {
-	return wprintfx(psR, "\tCTRL2: (x%02X)  dfc=%d  hpm=%d  fds=%d  hpis1=%d  hpis2=%d" strNL,
+	return xReport(psR, "\tCTRL2: (x%02X)  dfc=%d  hpm=%d  fds=%d  hpis1=%d  hpis2=%d" strNL,
 		sLIS2HH12.Reg.CTRL2, sLIS2HH12.Reg.ctrl2.dfc, sLIS2HH12.Reg.ctrl2.hpm,
 		sLIS2HH12.Reg.ctrl2.fds, sLIS2HH12.Reg.ctrl2.hpis1, sLIS2HH12.Reg.ctrl2.hpis2);
 }
 
 int li2hh12ReportCTRL3(report_t * psR) {
-	return wprintfx(psR, "\tCTRL3: (x%02X)  fifo_en=%d  stop_fth=%d  I1inact=%d  I1ig2=%d  I1ig1=%d  I1ovr=%d  I1fth=%d  I1drdy=%d" strNL,
+	return xReport(psR, "\tCTRL3: (x%02X)  fifo_en=%d  stop_fth=%d  I1inact=%d  I1ig2=%d  I1ig1=%d  I1ovr=%d  I1fth=%d  I1drdy=%d" strNL,
 		sLIS2HH12.Reg.CTRL3, sLIS2HH12.Reg.ctrl3.fifo_en, sLIS2HH12.Reg.ctrl3.stop_fth, sLIS2HH12.Reg.ctrl3.int1_inact,
 		sLIS2HH12.Reg.ctrl3.int1_ig2, sLIS2HH12.Reg.ctrl3.int1_ig1, sLIS2HH12.Reg.ctrl3.int1_ovr, sLIS2HH12.Reg.ctrl3.int1_fth, sLIS2HH12.Reg.ctrl3.int1_drdy);
 }
 
 int li2hh12ReportCTRL4(report_t * psR) {
-	return wprintfx(psR, "\tCTRL4: (x%02X)  bw=%d  fs=%d/%dG  bws_odr=%d  IAInc=%d  I2cdis=%d  sim=%d" strNL,
+	return xReport(psR, "\tCTRL4: (x%02X)  bw=%d  fs=%d/%dG  bws_odr=%d  IAInc=%d  I2cdis=%d  sim=%d" strNL,
 		sLIS2HH12.Reg.CTRL4, sLIS2HH12.Reg.ctrl4.bw, sLIS2HH12.Reg.ctrl4.fs, fs_scale[sLIS2HH12.Reg.ctrl4.fs]/1000,
 		sLIS2HH12.Reg.ctrl4.bw_scale_odr, sLIS2HH12.Reg.ctrl4.if_add_inc, sLIS2HH12.Reg.ctrl4.i2c_disable, sLIS2HH12.Reg.ctrl4.sim);
 }
 
 int li2hh12ReportCTRL5(report_t * psR) {
-	return wprintfx(psR, "\tCTRL5: (x%02X)  dbg=%d  rst=%d  dec=%d  st=%d  HLactive=%d  pp_od=%d" strNL,
+	return xReport(psR, "\tCTRL5: (x%02X)  dbg=%d  rst=%d  dec=%d  st=%d  HLactive=%d  pp_od=%d" strNL,
 		sLIS2HH12.Reg.CTRL5, sLIS2HH12.Reg.ctrl5.debug, sLIS2HH12.Reg.ctrl5.soft_reset, sLIS2HH12.Reg.ctrl5.dec,
 		sLIS2HH12.Reg.ctrl5.st, sLIS2HH12.Reg.ctrl5.h_lactive, sLIS2HH12.Reg.ctrl5.pp_od);
 }
 
 int li2hh12ReportCTRL6(report_t * psR) {
-	return wprintfx(psR, "\tCTRL6: (x%02X)  boot=%d  I2boot=%d  I2ig2=%d  I2ig1=%d  I2empty=%d  I2fth=%d  I2drdy=%d" strNL,
+	return xReport(psR, "\tCTRL6: (x%02X)  boot=%d  I2boot=%d  I2ig2=%d  I2ig1=%d  I2empty=%d  I2fth=%d  I2drdy=%d" strNL,
 		sLIS2HH12.Reg.CTRL6, sLIS2HH12.Reg.ctrl6.boot, sLIS2HH12.Reg.ctrl6.int2_boot, sLIS2HH12.Reg.ctrl6.int2_ig2,
 		sLIS2HH12.Reg.ctrl6.int2_ig1, sLIS2HH12.Reg.ctrl6.int2_empty, sLIS2HH12.Reg.ctrl6.int2_fth, sLIS2HH12.Reg.ctrl6.int2_drdy);
 }
 
 int li2hh12ReportCTRL7(report_t * psR) {
-	return wprintfx(psR, "\tCTRL7: (x%02X)  I2dcrm=%d  I1dcrm=%d  I2lir=%d  I1lir=%d  IG2_4d=%d  IG1_4d=%d" strNL,
+	return xReport(psR, "\tCTRL7: (x%02X)  I2dcrm=%d  I1dcrm=%d  I2lir=%d  I1lir=%d  IG2_4d=%d  IG1_4d=%d" strNL,
 		sLIS2HH12.Reg.CTRL7, sLIS2HH12.Reg.ctrl7.dcrm2, sLIS2HH12.Reg.ctrl7.dcrm1, sLIS2HH12.Reg.ctrl7.lir2,
 		sLIS2HH12.Reg.ctrl7.lir1, sLIS2HH12.Reg.ctrl7._4d_ig2, sLIS2HH12.Reg.ctrl7._4d_ig1);
 }
 
 int li2hh12ReportSTATUS(report_t * psR) {
-	return wprintfx(psR, "\tSTATUS: (x%02X)  ZYXor=%d  Zor=%d  Yor=%d  Xor=%d  ZYXda=%d  Zda=%d  Yda=%d  Xda=%d" strNL,
+	return xReport(psR, "\tSTATUS: (x%02X)  ZYXor=%d  Zor=%d  Yor=%d  Xor=%d  ZYXda=%d  Zda=%d  Yda=%d  Xda=%d" strNL,
 		sLIS2HH12.Reg.STATUS, sLIS2HH12.Reg.status.ZYXor, sLIS2HH12.Reg.status.Zor, sLIS2HH12.Reg.status.Yor, sLIS2HH12.Reg.status.Xor,
 		sLIS2HH12.Reg.status.ZYXda, sLIS2HH12.Reg.status.Zda, sLIS2HH12.Reg.status.Yda, sLIS2HH12.Reg.status.Xda);
 }
 
 int lis2hh12ReportOUTxyz(report_t * psR) {
-	return wprintfx(psR, "\tOUT_X=%hd  OUT_Y=%hd  OUT_Z=%hd" strNL, sLIS2HH12.Reg.i16OUT_X, sLIS2HH12.Reg.i16OUT_Y, sLIS2HH12.Reg.i16OUT_Z);
+	return xReport(psR, "\tOUT_X=%hd  OUT_Y=%hd  OUT_Z=%hd" strNL, sLIS2HH12.Reg.i16OUT_X, sLIS2HH12.Reg.i16OUT_Y, sLIS2HH12.Reg.i16OUT_Z);
 }
 
 int lis2hh12ReportFIFO_CTRL(report_t * psR) {
 	static char * fifoMode[] = { "Bypass", "FIFO", "Stream", "StoF", "BtoS", "5=inv", "6=inv", "BtoF" };
-	return wprintfx(psR, "\tFIFO_CTRL: (x%02X)  mode=%s(%hhu)  thres=%hhu" strNL, sLIS2HH12.Reg.FIFO_CTRL,
+	return xReport(psR, "\tFIFO_CTRL: (x%02X)  mode=%s(%hhu)  thres=%hhu" strNL, sLIS2HH12.Reg.FIFO_CTRL,
 		fifoMode[sLIS2HH12.Reg.fifo_ctrl.fmode], sLIS2HH12.Reg.fifo_ctrl.fmode, sLIS2HH12.Reg.fifo_ctrl.fth);
 }
 
 int lis2hh12ReportFIFO_SRC(report_t * psR) {
-	return wprintfx(psR, "\tFIFO_SRC: (x%02X)  fth=%d  ovr=%d  empty=%d  fss=%d" strNL, sLIS2HH12.Reg.FIFO_SRC,
+	return xReport(psR, "\tFIFO_SRC: (x%02X)  fth=%d  ovr=%d  empty=%d  fss=%d" strNL, sLIS2HH12.Reg.FIFO_SRC,
 		sLIS2HH12.Reg.fifo_src.fth, sLIS2HH12.Reg.fifo_src.ovr, sLIS2HH12.Reg.fifo_src.empty, sLIS2HH12.Reg.fifo_src.fss);
 }
 
@@ -220,22 +220,22 @@ int lis2hh12ReportIGx(report_t * psR, bool X) {
 	lis2hh12_ig_cfg_t CfgX = X ? sLIS2HH12.Reg.ig_cfg2 : sLIS2HH12.Reg.ig_cfg1;
 	lis2hh12_ig_src_t SrcX = X ? sLIS2HH12.Reg.ig_src2 : sLIS2HH12.Reg.ig_src1;
 	lis2hh12_ig_dur_t DurX = X ? sLIS2HH12.Reg.ig_dur2 : sLIS2HH12.Reg.ig_dur1;
-	int iRV = wprintfx(psR, "\tIG_CFG%d: (x%02X)  aoi=%d  d6=%d  Zh=%d  Zl=%d  Yh=%d  Yl=%d  Xh=%d  Xl=%d" strNL,
+	int iRV = xReport(psR, "\tIG_CFG%d: (x%02X)  aoi=%d  d6=%d  Zh=%d  Zl=%d  Yh=%d  Yl=%d  Xh=%d  Xl=%d" strNL,
 		X, CfgX, CfgX.aoi, CfgX.d6, CfgX.zh, CfgX.zl, CfgX.yh, CfgX.yl, CfgX.xh, CfgX.xl);
-	iRV += wprintfx(psR, "\tIG_SRC%d: (x%02X)  ia=%d  Zh=%d  Zl=%d  Yh=%d  Yl=%d  Xh=%d  Xl=%d" strNL,
+	iRV += xReport(psR, "\tIG_SRC%d: (x%02X)  ia=%d  Zh=%d  Zl=%d  Yh=%d  Yl=%d  Xh=%d  Xl=%d" strNL,
 		X, SrcX, SrcX.ia, SrcX.zh, SrcX.zl, SrcX.yh, SrcX.yl, SrcX.xh, SrcX.xl);
-	iRV += wprintfx(psR, "\tIG%d: (x%02X)  wait=%d  dur=%d  ths", X, DurX, DurX.wait, DurX.ths);
-	if (X) iRV += wprintfx(psR, "=%d" strNL, sLIS2HH12.Reg.IG_THS2);
-	else iRV += wprintfx(psR, ": X=%d  Y=%d  Z=%d" strNL, sLIS2HH12.Reg.IG_THS_X1, sLIS2HH12.Reg.IG_THS_Y1, sLIS2HH12.Reg.IG_THS_Z1);
+	iRV += xReport(psR, "\tIG%d: (x%02X)  wait=%d  dur=%d  ths", X, DurX, DurX.wait, DurX.ths);
+	if (X) iRV += xReport(psR, "=%d" strNL, sLIS2HH12.Reg.IG_THS2);
+	else iRV += xReport(psR, ": X=%d  Y=%d  Z=%d" strNL, sLIS2HH12.Reg.IG_THS_X1, sLIS2HH12.Reg.IG_THS_Y1, sLIS2HH12.Reg.IG_THS_Z1);
 	return iRV;
 }
 
 int lis2hh12ReportREFxyz(report_t * psR) {
-	return wprintfx(psR, "\tREF_X=%d  REF_Y=%d  REF_Z=%d" strNL, sLIS2HH12.Reg.u16REF_X, sLIS2HH12.Reg.u16REF_Y, sLIS2HH12.Reg.u16REF_Z);
+	return xReport(psR, "\tREF_X=%d  REF_Y=%d  REF_Z=%d" strNL, sLIS2HH12.Reg.u16REF_X, sLIS2HH12.Reg.u16REF_Y, sLIS2HH12.Reg.u16REF_Z);
 }
 
 int lis2hh12ReportCounters(report_t * psR) {
-	return wprintfx(psR, "\tIRQs OK=%lu  Lost=%lu  DRDY=%lu  DRDYerr=%lu  FIFO=%lu  IG1=%lu  IG2=%lu  INACT=%lu  BOOT=%lu" strNL, lis2hh12IRQok,
+	return xReport(psR, "\tIRQs OK=%lu  Lost=%lu  DRDY=%lu  DRDYerr=%lu  FIFO=%lu  IG1=%lu  IG2=%lu  INACT=%lu  BOOT=%lu" strNL, lis2hh12IRQok,
 		lis2hh12IRQlost, lis2hh12IRQdrdy, lis2hh12IRQdrdyErr, lis2hh12IRQfifo, lis2hh12IRQig1, lis2hh12IRQig2, lis2hh12IRQinact, lis2hh12IRQboot);
 }
 
