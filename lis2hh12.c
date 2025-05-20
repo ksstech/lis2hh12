@@ -6,7 +6,6 @@
 #include "endpoints.h"
 #include "hal_i2c_common.h"
 #include "hal_memory.h"
-#include "hal_options.h"
 #include "lis2hh12.h"
 #include "report.h"
 #include "rules.h"
